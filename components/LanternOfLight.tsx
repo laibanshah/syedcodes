@@ -3,7 +3,25 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-export default function LanternOfLight() {
+interface LanternContent {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+}
+
+interface LanternOfLightProps {
+  content?: LanternContent;
+}
+
+export default function LanternOfLight({ content }: LanternOfLightProps) {
+  const data = content || {
+    title: "Lantern of Light",
+    subtitle: "Spiritual & Islamic Community",
+    description: "A spiritual and Islamic community presentation focused on guiding hearts, sharing wisdom, and fostering a supportive environment built on faith and unity.",
+    image: "/assets/lol.png"
+  };
+
   return (
     <section className="py-32 relative bg-background border-y border-border overflow-hidden">
       {/* Subtle Background Elements */}
@@ -23,8 +41,8 @@ export default function LanternOfLight() {
             <div className="relative w-64 h-64 md:w-96 md:h-96 rounded-full p-4 border border-primary/20 bg-card/30 backdrop-blur-sm shadow-2xl">
               <div className="relative w-full h-full rounded-full overflow-hidden bg-card flex items-center justify-center">
                  <Image
-                    src="/assets/lol.png"
-                    alt="Lantern of Light Logo"
+                    src={data.image}
+                    alt={data.title}
                     fill
                     className="object-contain p-8 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                  />
@@ -39,10 +57,10 @@ export default function LanternOfLight() {
             transition={{ duration: 0.8 }}
             className="w-full md:w-1/2 text-center md:text-left"
           >
-            <h2 className="text-3xl md:text-5xl font-heading text-foreground mb-6">Lantern of Light</h2>
+            <h2 className="text-3xl md:text-5xl font-heading text-foreground mb-6">{data.title}</h2>
             <div className="w-16 h-1 bg-primary mb-6 rounded-full mx-auto md:mx-0" />
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              A spiritual and Islamic community presentation focused on guiding hearts, sharing wisdom, and fostering a supportive environment built on faith and unity.
+              {data.description}
             </p>
             
             <a

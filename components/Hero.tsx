@@ -4,13 +4,32 @@ import { motion } from "framer-motion";
 import { ArrowRight, Download } from "lucide-react";
 import Image from "next/image";
 
-export default function Hero() {
+interface HeroProps {
+  title?: string;
+  subtitle?: string;
+  video?: string;
+}
+
+export default function Hero({ title, subtitle, video }: HeroProps) {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-brand-blue-light/5 rounded-full blur-[150px]" />
+        {video ? (
+          <video
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+          />
+        ) : (
+          <>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-brand-blue-light/5 rounded-full blur-[150px]" />
+          </>
+        )}
       </div>
 
       <div className="container mx-auto px-4 z-10 grid lg:grid-cols-2 gap-12 items-center">
@@ -32,10 +51,14 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="text-5xl md:text-7xl font-bold text-foreground leading-tight mb-6 tracking-tight"
           >
-            Welcome to <br />
-            <span className="text-primary">
-              SyedCodes.UI
-            </span>
+            {title || (
+              <>
+                Welcome to <br />
+                <span className="text-primary">
+                  SyedCodes.UI
+                </span>
+              </>
+            )}
           </motion.h1>
 
           <motion.p
@@ -44,7 +67,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 leading-relaxed"
           >
-            Crafting luxury modern layouts, responsive web applications, and digital experiences that leave a lasting impression.
+            {subtitle || "Crafting luxury modern layouts, responsive web applications, and digital experiences that leave a lasting impression."}
           </motion.p>
 
           <motion.div

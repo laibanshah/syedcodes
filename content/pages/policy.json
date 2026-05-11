@@ -1,0 +1,36 @@
+{
+  "title": "Work & Privacy Policy",
+  "subtitle": "Transparent and professional guidelines ensuring a smooth, secure, and successful collaboration.",
+  "policies": [
+    {
+      "title": "50% Advance",
+      "description": "A 50% upfront payment is required to commence work and secure your project slot.",
+      "icon": "CreditCard"
+    },
+    {
+      "title": "50% On Completion",
+      "description": "The remaining 50% balance is due upon project completion, prior to final deployment.",
+      "icon": "Code"
+    },
+    {
+      "title": "Full Deployment Handover",
+      "description": "Complete deployment assistance. All credentials and source code are handed over to the client.",
+      "icon": "Server"
+    },
+    {
+      "title": "24-Hour Refund Policy",
+      "description": "Full refund guaranteed within 24 hours of the initial project agreement if you change your mind.",
+      "icon": "ShieldCheck"
+    },
+    {
+      "title": "1 Month Free Support",
+      "description": "Enjoy one month of complimentary technical support and bug fixes after the launch.",
+      "icon": "Headphones"
+    },
+    {
+      "title": "New Features & Add-ons",
+      "description": "Any new features requested after delivery will be billed as separate, additional charges.",
+      "icon": "Plus"
+    }
+  ]
+}

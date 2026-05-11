@@ -31,6 +31,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
     >
+      <head>
+        <script src="https://identity.netlify.com/v1/netlify-identity-widget.js" async />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground selection:bg-gold selection:text-charcoal-900">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <SmoothScroll>
@@ -38,6 +41,21 @@ export default function RootLayout({
             <Toaster position="bottom-right" />
           </SmoothScroll>
         </ThemeProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (window.netlifyIdentity) {
+                window.netlifyIdentity.on("init", user => {
+                  if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                      document.location.href = "/admin/";
+                    });
+                  }
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

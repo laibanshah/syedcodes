@@ -15,7 +15,16 @@ const navLinks = [
   { name: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
+interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+interface NavbarProps {
+  socialLinks?: SocialLink[];
+}
+
+export default function Navbar({ socialLinks }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

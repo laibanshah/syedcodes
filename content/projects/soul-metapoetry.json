@@ -1,0 +1,8 @@
+{
+  "title": "SOUL METAPOETRY",
+  "description": "Soulful Meta Poetry is a warm archive of quiet intensity — a place where tenderness is treated as craft, and where the unsaid is given a refined page to live on.",
+  "tech": ["React", "GSAP", "Tailwind CSS", "Vite"],
+  "link": "https://soulmp.netlify.app/about",
+  "video": "/assets/soulful.mp4",
+  "order": 2
+}

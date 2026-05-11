@@ -1,0 +1,8 @@
+{
+  "title": "The RAW SOCIETY",
+  "description": "Raw Society is a global discussion community that brings together people from all walks of life to share their ideas, experiences, and perspectives in a supportive and inclusive environment. Every Sunday, we gather on Google Meet for our weekly sessions where participants get the opportunity to speak for approximately 5 minutes in their preferred language.",
+  "tech": ["Next.js", "React", "Tailwind CSS", "Framer Motion"],
+  "link": "https://rawsociety.netlify.app/",
+  "video": "/assets/raw society.mp4",
+  "order": 1
+}

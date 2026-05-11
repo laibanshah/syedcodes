@@ -12,7 +12,12 @@ const skills = [
   { name: "Tailwind CSS", level: 95 },
 ];
 
-export default function About() {
+interface AboutProps {
+  title?: string;
+  content?: string;
+}
+
+export default function About({ title, content }: AboutProps) {
   return (
     <section id="about" className="py-32 relative">
       <div className="container mx-auto px-4 md:px-6 z-10">
@@ -24,10 +29,12 @@ export default function About() {
             transition={{ duration: 0.8 }}
             className="mb-16 text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-heading text-foreground mb-6">The Architect Behind the Code</h2>
+            <h2 className="text-4xl md:text-5xl font-heading text-foreground mb-6">
+              {title || "The Architect Behind the Code"}
+            </h2>
             <div className="w-20 h-1 bg-primary mx-auto mb-8 rounded-full" />
             <p className="text-lg text-muted-foreground leading-relaxed">
-              I am a passionate web developer specializing in building premium, cinematic, and responsive static and dynamic websites. My client-focused approach ensures every pixel is perfect and every interaction feels professional.
+              {content || "I am a passionate web developer specializing in building premium, cinematic, and responsive static and dynamic websites. My client-focused approach ensures every pixel is perfect and every interaction feels professional."}
             </p>
           </motion.div>
 

@@ -1,4 +1,13 @@
-export default function Footer() {
+interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+interface FooterProps {
+  socialLinks?: SocialLink[];
+}
+
+export default function Footer({ socialLinks }: FooterProps) {
   return (
     <footer className="border-t border-border bg-card py-12">
       <div className="container mx-auto px-4 md:px-6">
@@ -12,9 +21,24 @@ export default function Footer() {
           </div>
 
           <div className="flex gap-6">
-            <a href="#home" className="text-sm text-muted-foreground hover:text-primary transition-colors">Home</a>
-            <a href="#projects" className="text-sm text-muted-foreground hover:text-primary transition-colors">Projects</a>
-            <a href="#policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Policy</a>
+            {socialLinks?.map((link) => (
+              <a 
+                key={link.platform} 
+                href={link.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {link.platform}
+              </a>
+            ))}
+            {!socialLinks && (
+              <>
+                <a href="#home" className="text-sm text-muted-foreground hover:text-primary transition-colors">Home</a>
+                <a href="#projects" className="text-sm text-muted-foreground hover:text-primary transition-colors">Projects</a>
+                <a href="#policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Policy</a>
+              </>
+            )}
           </div>
         </div>
       </div>

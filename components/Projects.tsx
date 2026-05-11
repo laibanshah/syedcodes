@@ -4,24 +4,19 @@ import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 
-const projects = [
-  {
-    title: "The RAW SOCIETY",
-    description: "Raw Society is a global discussion community that brings together people from all walks of life to share their ideas, experiences, and perspectives in a supportive and inclusive environment. Every Sunday, we gather on Google Meet for our weekly sessions where participants get the opportunity to speak for approximately 5 minutes in their preferred language.",
-    tech: ["Next.js", "React", "Tailwind CSS", "Framer Motion"],
-    link: "https://rawsociety.netlify.app/",
-    video: "/assets/raw society.mp4"
-  },
-  {
-    title: "SOUL METAPOETRY",
-    description: "Soulful Meta Poetry is a warm archive of quiet intensity — a place where tenderness is treated as craft, and where the unsaid is given a refined page to live on.",
-    tech: ["React", "GSAP", "Tailwind CSS", "Vite"],
-    link: "https://soulmp.netlify.app/about",
-    video: "/assets/soulful.mp4"
-  }
-];
+interface Project {
+  title: string;
+  description: string;
+  tech: string[];
+  link: string;
+  video: string;
+}
 
-export default function Projects() {
+interface ProjectsProps {
+  projects: Project[];
+}
+
+export default function Projects({ projects }: ProjectsProps) {
   return (
     <section id="projects" className="py-32 relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">

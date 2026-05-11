@@ -1,0 +1,70 @@
+backend:
+  name: git-gateway
+  branch: main # Ensure this matches your default branch
+
+local_backend: true # Enables local development
+
+media_folder: "public/assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "settings"
+    label: "Global Settings"
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: "general"
+        label: "General Settings"
+        file: "content/settings/general.json"
+        fields:
+          - { label: "Site Title", name: "site_title", widget: "string" }
+          - { label: "Hero Title", name: "hero_title", widget: "string" }
+          - { label: "Hero Subtitle", name: "hero_subtitle", widget: "text" }
+          - { label: "Hero Video", name: "hero_video", widget: "file", required: false }
+          - { label: "About Title", name: "about_title", widget: "string" }
+          - { label: "About Content", name: "about_content", widget: "markdown" }
+          - label: "Social Links"
+            name: "social_links"
+            widget: "list"
+            fields:
+              - { label: "Platform", name: "platform", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+
+  - name: "projects"
+    label: "Portfolio Projects"
+    folder: "content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Technologies", name: "tech", widget: "list" }
+      - { label: "Project Link", name: "link", widget: "string" }
+      - { label: "Video/Image", name: "video", widget: "file" }
+      - { label: "Order", name: "order", widget: "number", default: 0 }
+
+  - name: "pages"
+    label: "Pages"
+    files:
+      - name: "policy"
+        label: "Work Policy"
+        file: "content/pages/policy.json"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Subtitle", name: "subtitle", widget: "text" }
+          - label: "Policies"
+            name: "policies"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - { label: "Icon Name", name: "icon", widget: "string", hint: "Lucide icon name like 'CreditCard', 'Code', etc." }
+      - name: "lantern"
+        label: "Lantern of Light"
+        file: "content/pages/lantern.json"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Subtitle", name: "subtitle", widget: "string" }
+          - { label: "Description", name: "description", widget: "markdown" }
+          - { label: "Image", name: "image", widget: "image" }
