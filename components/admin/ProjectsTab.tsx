@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, ExternalLink, Upload, X } from "lucide-react";
-import { Project } from "@/lib/supabase";
+import { Project } from "@/lib/types";
 import { getProjects, createProject, updateProject, deleteProject, uploadProjectImage, deleteProjectImage } from "@/lib/db";
 import { toast } from "sonner";
 

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Mail, MessageCircle } from "lucide-react";
 import { FaWhatsapp, FaYoutube, FaGithub, FaLinkedin, FaInstagram, FaTwitter, FaFacebook } from "react-icons/fa";
-import { ContactLink } from "@/lib/supabase";
+import { ContactLink } from "@/lib/types";
 import { getContactLinks } from "@/lib/db";
 import { useEffect, useState } from "react";
 

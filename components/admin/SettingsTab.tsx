@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, X } from "lucide-react";
-import { Setting } from "@/lib/supabase";
+import { Setting } from "@/lib/types";
 import { getSetting, updateSetting } from "@/lib/db";
 import { toast } from "sonner";
 

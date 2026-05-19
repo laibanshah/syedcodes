@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, X } from "lucide-react";
-import { AboutSection } from "@/lib/supabase";
+import { AboutSection } from "@/lib/types";
 import { getAboutSection, updateAboutSection } from "@/lib/db";
 import { toast } from "sonner";
 

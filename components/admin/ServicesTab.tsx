@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, X, GripVertical } from "lucide-react";
-import { Service } from "@/lib/supabase";
+import { Service } from "@/lib/types";
 import { getServices, createService, updateService, deleteService } from "@/lib/db";
 import { toast } from "sonner";
 

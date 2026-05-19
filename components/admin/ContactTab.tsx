@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, X, GripVertical } from "lucide-react";
-import { ContactLink } from "@/lib/supabase";
+import { ContactLink } from "@/lib/types";
 import { getContactLinks, createContactLink, updateContactLink, deleteContactLink } from "@/lib/db";
 import { toast } from "sonner";
 

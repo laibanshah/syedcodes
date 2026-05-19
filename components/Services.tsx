@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Monitor, Globe, Server, Lock, PenTool, Briefcase, Code, Database, Smartphone, Layout } from "lucide-react";
-import { Service } from "@/lib/supabase";
+import { Service } from "@/lib/types";
 import { getServices } from "@/lib/db";
 import { useEffect, useState } from "react";
 
