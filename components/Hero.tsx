@@ -77,10 +77,10 @@ export default function Hero({ title, subtitle, video }: HeroProps) {
             className="flex flex-wrap gap-4"
           >
             <a
-              href="#projects"
+              href="/projects"
               className="group flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-bold transition-all hover:bg-brand-blue-dark hover:scale-105 shadow-lg shadow-primary/20"
             >
-              View My Work
+              View Projects
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a

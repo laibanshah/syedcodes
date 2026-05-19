@@ -28,7 +28,7 @@ interface WorkPolicyProps {
   content?: PolicyContent;
 }
 
-export default function WorkPolicy({ content }: WorkPolicyProps) {
+export default function WorkPolicy({ content }: WorkPolicyProps = {}) {
   const data = content || {
     title: "Work & Privacy Policy",
     subtitle: "Transparent and professional guidelines ensuring a smooth, secure, and successful collaboration.",

@@ -1,42 +1,47 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Monitor, Globe, Server, Lock, PenTool, Briefcase } from "lucide-react";
+import { Monitor, Globe, Server, Lock, PenTool, Briefcase, Code, Database, Smartphone, Layout } from "lucide-react";
+import { Service } from "@/lib/supabase";
+import { getServices } from "@/lib/db";
+import { useEffect, useState } from "react";
 
-const services = [
-  {
-    title: "Static Websites",
-    description: "Fast, secure, and beautiful static sites tailored for small businesses and personal portfolios.",
-    icon: <Globe className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Dynamic Web Apps",
-    description: "Complex, interactive web applications built with React and Next.js for scalable solutions.",
-    icon: <Monitor className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Admin Dashboards",
-    description: "Custom dashboards for managing data, users, and content with intuitive UI.",
-    icon: <Server className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Authentication Systems",
-    description: "Secure login, registration, and role-based access control for your applications.",
-    icon: <Lock className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Blogging Platforms",
-    description: "SEO-optimized, content-rich blogging systems with easy-to-use CMS integration.",
-    icon: <PenTool className="w-8 h-8 text-primary" />,
-  },
-  {
-    title: "Business Websites",
-    description: "Corporate websites designed to establish trust, generate leads, and showcase services.",
-    icon: <Briefcase className="w-8 h-8 text-primary" />,
-  },
-];
+const iconMap: Record<string, React.ReactNode> = {
+  Globe: <Globe className="w-8 h-8 text-primary" />,
+  Monitor: <Monitor className="w-8 h-8 text-primary" />,
+  Server: <Server className="w-8 h-8 text-primary" />,
+  Lock: <Lock className="w-8 h-8 text-primary" />,
+  PenTool: <PenTool className="w-8 h-8 text-primary" />,
+  Briefcase: <Briefcase className="w-8 h-8 text-primary" />,
+  Code: <Code className="w-8 h-8 text-primary" />,
+  Database: <Database className="w-8 h-8 text-primary" />,
+  Smartphone: <Smartphone className="w-8 h-8 text-primary" />,
+  Layout: <Layout className="w-8 h-8 text-primary" />,
+};
 
 export default function Services() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    try {
+      const data = await getServices();
+      setServices(data);
+    } catch (error) {
+      console.error("Failed to load services:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <section id="services" className="py-32 bg-secondary/30 relative">
       <div className="container mx-auto px-4 md:px-6">
@@ -51,7 +56,7 @@ export default function Services() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <motion.div
-              key={service.title}
+              key={service.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -60,7 +65,7 @@ export default function Services() {
               className="bg-card border border-border p-8 rounded-3xl hover:border-primary/30 transition-all duration-300 group shadow-lg"
             >
               <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                {service.icon}
+                {iconMap[service.icon_name] || <Globe className="w-8 h-8 text-primary" />}
               </div>
               <h3 className="text-xl font-heading text-foreground mb-4">{service.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{service.description}</p>

@@ -14,7 +14,7 @@ interface LanternOfLightProps {
   content?: LanternContent;
 }
 
-export default function LanternOfLight({ content }: LanternOfLightProps) {
+export default function LanternOfLight({ content }: LanternOfLightProps = {}) {
   const data = content || {
     title: "Lantern of Light",
     subtitle: "Spiritual & Islamic Community",

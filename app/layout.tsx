@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,31 +32,28 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
     >
-      <head>
-        <script src="https://identity.netlify.com/v1/netlify-identity-widget.js" async />
-      </head>
+      <head />
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground selection:bg-gold selection:text-charcoal-900">
+        <Script src="https://identity.netlify.com/v1/netlify-identity-widget.js" strategy="afterInteractive" />
+        <Script id="netlify-identity-widget-init" strategy="afterInteractive">
+          {`
+            if (window.netlifyIdentity) {
+              window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                  window.netlifyIdentity.on("login", () => {
+                    document.location.href = "/admin/";
+                  });
+                }
+              });
+            }
+          `}
+        </Script>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <SmoothScroll>
             {children}
             <Toaster position="bottom-right" />
           </SmoothScroll>
         </ThemeProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (window.netlifyIdentity) {
-                window.netlifyIdentity.on("init", user => {
-                  if (!user) {
-                    window.netlifyIdentity.on("login", () => {
-                      document.location.href = "/admin/";
-                    });
-                  }
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );

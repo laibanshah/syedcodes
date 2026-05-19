@@ -5,11 +5,12 @@ import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 interface Project {
+  id: string;
   title: string;
   description: string;
-  tech: string[];
   link: string;
-  video: string;
+  image_url: string | null;
+  tech_stack: string[];
 }
 
 interface ProjectsProps {
@@ -53,19 +54,22 @@ export default function Projects({ projects }: ProjectsProps) {
                       className="w-full h-auto relative z-20 pointer-events-none drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                     />
                     
-                    {/* Screen Video Container - precise positioning based on standard MacBook mockup */}
+                    {/* Screen Image Container - precise positioning based on standard MacBook mockup */}
                     <div className="absolute top-[8%] left-[12%] right-[12%] bottom-[14%] overflow-hidden bg-black rounded-t-sm z-10"
                          style={{ 
                            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' 
                          }}>
-                      <video
-                        src={project.video}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover object-top transition-opacity duration-500 group-hover:opacity-100 scale-[1.01]"
-                      />
+                      {project.image_url ? (
+                        <img
+                          src={project.image_url}
+                          alt={project.title}
+                          className="w-full h-full object-cover object-top transition-opacity duration-500 group-hover:opacity-100 scale-[1.01]"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-primary/30">{project.title}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -85,7 +89,7 @@ export default function Projects({ projects }: ProjectsProps) {
                 </div>
                 
                 <div className="flex flex-wrap gap-3 mb-10">
-                  {project.tech.map((tech) => (
+                  {project.tech_stack.map((tech: string) => (
                     <span key={tech} className="px-4 py-2 bg-secondary border border-border rounded-full text-xs text-primary font-bold">
                       {tech}
                     </span>

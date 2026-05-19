@@ -2,42 +2,45 @@
 
 import { motion } from "framer-motion";
 import { Mail, MessageCircle } from "lucide-react";
-import { FaWhatsapp, FaYoutube, FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
+import { FaWhatsapp, FaYoutube, FaGithub, FaLinkedin, FaInstagram, FaTwitter, FaFacebook } from "react-icons/fa";
+import { ContactLink } from "@/lib/supabase";
+import { getContactLinks } from "@/lib/db";
+import { useEffect, useState } from "react";
 
-const socialLinks = [
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/laiban-shah-394483408",
-    icon: <FaLinkedin className="w-6 h-6" />,
-  },
-  {
-    name: "GitHub",
-    href: "https://github.com/laibanshah",
-    icon: <FaGithub className="w-6 h-6" />,
-  },
-  {
-    name: "Instagram",
-    href: "https://www.instagram.com/syedcodes.ui/",
-    icon: <FaInstagram className="w-6 h-6" />,
-  },
-  {
-    name: "YouTube",
-    href: "https://www.youtube.com/@lantern_oflight",
-    icon: <FaYoutube className="w-6 h-6" />,
-  },
-  {
-    name: "WhatsApp",
-    href: "https://wa.me/message/YOUR_WHATSAPP_LINK", // Replace if specific link provided
-    icon: <FaWhatsapp className="w-6 h-6" />,
-  },
-  {
-    name: "Email",
-    href: "mailto:lanternoflight11@gmail.com",
-    icon: <Mail className="w-6 h-6" />,
-  },
-];
+const iconMap: Record<string, React.ReactNode> = {
+  FaLinkedin: <FaLinkedin className="w-6 h-6" />,
+  FaGithub: <FaGithub className="w-6 h-6" />,
+  FaInstagram: <FaInstagram className="w-6 h-6" />,
+  FaYoutube: <FaYoutube className="w-6 h-6" />,
+  FaWhatsapp: <FaWhatsapp className="w-6 h-6" />,
+  Mail: <Mail className="w-6 h-6" />,
+  Twitter: <FaTwitter className="w-6 h-6" />,
+  FaFacebook: <FaFacebook className="w-6 h-6" />,
+};
 
 export default function Contact() {
+  const [contactLinks, setContactLinks] = useState<ContactLink[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadContactLinks();
+  }, []);
+
+  const loadContactLinks = async () => {
+    try {
+      const data = await getContactLinks();
+      setContactLinks(data);
+    } catch (error) {
+      console.error("Failed to load contact links:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <section id="contact" className="py-32 relative">
       <div className="container mx-auto px-4 md:px-6">
@@ -62,18 +65,18 @@ export default function Contact() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-wrap justify-center gap-6"
           >
-            {socialLinks.map((link) => (
+            {contactLinks.map((link) => (
               <a
-                key={link.name}
-                href={link.href}
+                key={link.id}
+                href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-6 py-4 rounded-full bg-card border border-border hover:border-primary/30 hover:bg-primary/5 text-foreground transition-all duration-300 group shadow-sm"
               >
                 <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                  {link.icon}
+                  {iconMap[link.icon_name] || <Mail className="w-6 h-6" />}
                 </div>
-                <span className="font-bold">{link.name}</span>
+                <span className="font-bold">{link.platform}</span>
               </a>
             ))}
           </motion.div>
