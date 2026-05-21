@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import Tilt from "react-parallax-tilt";
 
 interface Project {
   id: string;
@@ -18,98 +20,198 @@ interface ProjectsProps {
 }
 
 export default function Projects({ projects }: ProjectsProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const nextProject = () => {
+    setCurrentIndex((prev) => (prev + 1) % projects.length);
+  };
+
+  const prevProject = () => {
+    setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
+  };
+
+  const currentProject = projects[currentIndex];
+
   return (
-    <section id="projects" className="py-32 relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-24">
-          <h2 className="text-4xl md:text-5xl font-heading text-foreground mb-6">Featured Masterpieces</h2>
-          <div className="w-20 h-1 bg-primary mx-auto mb-6 rounded-full" />
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+    <section id="projects" className="py-24 md:py-32 relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/30 pointer-events-none" />
+      
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="text-center mb-16 md:mb-24">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
+          >
+            Featured <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Projects</span>
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            whileInView={{ opacity: 1, width: "80px" }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="h-1 bg-gradient-to-r from-primary to-purple-600 mx-auto mb-6 rounded-full"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg"
+          >
             A curated selection of digital experiences crafted with precision and care.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="space-y-32">
-          {projects.map((project, index) => (
-            <div key={project.title} className={`flex flex-col lg:flex-row gap-12 lg:gap-20 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
-              
-              {/* Cinematic Laptop Mockup */}
+        {/* Filter Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap justify-center gap-3 mb-12 md:mb-16"
+        >
+          {["All", "Web", "Mobile", "Design"].map((filter) => (
+            <button
+              key={filter}
+              className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground hover:border-primary"
+            >
+              {filter}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* 3D Flashcard Carousel */}
+        <div className="relative max-w-5xl mx-auto">
+          {currentProject && (
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.5 }}
+              className="grid md:grid-cols-2 gap-8 md:gap-12 items-center"
+            >
+              {/* 3D Flashcard Image */}
               <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="w-full lg:w-3/5 relative perspective-1000"
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative"
               >
-                <div className="relative w-full max-w-[800px] mx-auto group">
-                  <div className="absolute inset-0 bg-primary/5 blur-[100px] rounded-full mix-blend-screen transition-opacity duration-700 group-hover:opacity-100 opacity-50" />
-                  
-                  {/* Laptop Frame */}
-                  <div className="relative z-10 drop-shadow-2xl hover:scale-[1.02] transition-transform duration-700">
-                    <Image
-                      src="/assets/mockup_laptop.png"
-                      alt="MacBook Mockup"
-                      width={1200}
-                      height={800}
-                      className="w-full h-auto relative z-20 pointer-events-none drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-                    />
+                <Tilt
+                  glareEnable={true}
+                  glareMaxOpacity={0.15}
+                  glareColor="#ffffff"
+                  glarePosition="all"
+                  glareBorderRadius="24px"
+                  scale={1.02}
+                  transitionSpeed={500}
+                  tiltMaxAngleX={8}
+                  tiltMaxAngleY={8}
+                  className="relative"
+                >
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-border/30">
+                    {/* Layered depth effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 pointer-events-none" />
                     
-                    {/* Screen Image Container - precise positioning based on standard MacBook mockup */}
-                    <div className="absolute top-[8%] left-[12%] right-[12%] bottom-[14%] overflow-hidden bg-black rounded-t-sm z-10"
-                         style={{ 
-                           clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' 
-                         }}>
-                      {project.image_url ? (
-                        <img
-                          src={project.image_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover object-top transition-opacity duration-500 group-hover:opacity-100 scale-[1.01]"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                          <span className="text-2xl font-bold text-primary/30">{project.title}</span>
-                        </div>
-                      )}
+                    {currentProject.image_url ? (
+                      <Image
+                        src={currentProject.image_url}
+                        alt={currentProject.title}
+                        width={800}
+                        height={600}
+                        className="w-full h-auto object-cover rounded-3xl"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full aspect-[4/3] bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                        <span className="text-4xl font-bold text-primary/30">{currentProject.title[0]}</span>
+                      </div>
+                    )}
+                    
+                    {/* Floating badge */}
+                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-card/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
+                      <span className="text-xs font-bold text-primary">Featured</span>
                     </div>
                   </div>
+                </Tilt>
+
+                {/* Navigation arrows */}
+                <div className="flex justify-center gap-4 mt-8">
+                  <button
+                    onClick={prevProject}
+                    className="p-3 rounded-full bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-border/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
+                    aria-label="Previous project"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={nextProject}
+                    className="p-3 rounded-full bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-border/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
+                    aria-label="Next project"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               </motion.div>
 
               {/* Project Details */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="w-full lg:w-2/5 flex flex-col justify-center"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col justify-center"
               >
-                <h3 className="text-3xl md:text-4xl font-heading text-foreground mb-6">{project.title}</h3>
-                <div className="bg-card border border-border p-6 rounded-2xl mb-8 shadow-xl">
-                  <p className="text-muted-foreground leading-relaxed">{project.description}</p>
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+                  {currentProject.title}
+                </h3>
+                
+                <div className="bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 p-6 md:p-8 rounded-3xl mb-8 shadow-xl">
+                  <p className="text-muted-foreground leading-relaxed text-base md:text-lg">
+                    {currentProject.description}
+                  </p>
                 </div>
                 
-                <div className="flex flex-wrap gap-3 mb-10">
-                  {project.tech_stack.map((tech: string) => (
-                    <span key={tech} className="px-4 py-2 bg-secondary border border-border rounded-full text-xs text-primary font-bold">
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {currentProject.tech_stack.map((tech: string) => (
+                    <span
+                      key={tech}
+                      className="px-4 py-2 bg-gradient-to-r from-primary/10 to-purple-500/10 border border-border/50 rounded-full text-xs md:text-sm font-semibold text-foreground hover:border-primary/50 transition-colors"
+                    >
                       {tech}
                     </span>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold transition-transform hover:scale-105 shadow-lg shadow-primary/20"
-                  >
-                    View Live <ExternalLink size={18} />
-                  </a>
-                </div>
+                <a
+                  href={currentProject.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 w-full md:w-auto"
+                >
+                  View Live Project <ExternalLink size={18} />
+                </a>
               </motion.div>
+            </motion.div>
+          )}
 
-            </div>
-          ))}
+          {/* Project indicators */}
+          <div className="flex justify-center gap-2 mt-12">
+            {projects.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex ? "w-8 bg-primary" : "bg-border/50 hover:bg-border"
+                }`}
+                aria-label={`Go to project ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

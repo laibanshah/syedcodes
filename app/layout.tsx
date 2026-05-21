@@ -48,7 +48,7 @@ export default function RootLayout({
             }
           `}
         </Script>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <SmoothScroll>
             {children}
             <Toaster position="bottom-right" />
