@@ -20,6 +20,7 @@ export default function ProjectsTab() {
     description: "",
     link: "",
     tech_stack: "",
+    featured: false,
   });
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function ProjectsTab() {
           link: formData.link,
           image_url: imageUrl,
           tech_stack: techStackArray,
+          featured: formData.featured,
         });
         toast.success("Project updated successfully");
       } else {
@@ -87,6 +89,7 @@ export default function ProjectsTab() {
           link: formData.link,
           image_url: imageUrl,
           tech_stack: techStackArray,
+          featured: formData.featured,
         });
         toast.success("Project created successfully");
       }
@@ -106,6 +109,7 @@ export default function ProjectsTab() {
       description: project.description,
       link: project.link,
       tech_stack: project.tech_stack.join(", "),
+      featured: project.featured || false,
     });
     setImagePreview(project.image_url || "");
     setShowForm(true);
@@ -128,7 +132,7 @@ export default function ProjectsTab() {
   };
 
   const resetForm = () => {
-    setFormData({ title: "", description: "", link: "", tech_stack: "" });
+    setFormData({ title: "", description: "", link: "", tech_stack: "", featured: false });
     setEditingProject(null);
     setImageFile(null);
     setImagePreview("");
@@ -230,6 +234,19 @@ export default function ProjectsTab() {
               />
             </div>
 
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="featured"
+                checked={formData.featured}
+                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary"
+              />
+              <label htmlFor="featured" className="text-sm font-medium text-foreground">
+                Featured Project (will appear in homepage carousel)
+              </label>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Project Image
@@ -320,7 +337,14 @@ export default function ProjectsTab() {
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">{project.title}</h3>
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-xl font-semibold text-foreground">{project.title}</h3>
+                    {project.featured && (
+                      <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
+                        Featured
+                      </span>
+                    )}
+                  </div>
                   <p className="text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.tech_stack.map((tech) => (

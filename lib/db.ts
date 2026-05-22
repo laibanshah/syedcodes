@@ -12,6 +12,7 @@ const FALLBACK_PROJECTS: Project[] = [
     link: 'https://github.com/laibanshah',
     image_url: null,
     tech_stack: ['Next.js', 'React', 'Framer Motion', 'TailwindCSS'],
+    featured: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -22,6 +23,7 @@ const FALLBACK_PROJECTS: Project[] = [
     link: 'https://github.com/laibanshah',
     image_url: null,
     tech_stack: ['Next.js', 'React', 'Framer Motion', 'Vanilla CSS'],
+    featured: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }
@@ -181,6 +183,25 @@ export async function getProjects(): Promise<Project[]> {
   }
 }
 
+export async function getFeaturedProjects(): Promise<Project[]> {
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('featured', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching featured projects:', error.message);
+      return FALLBACK_PROJECTS.filter(p => p.featured);
+    }
+    return data || FALLBACK_PROJECTS.filter(p => p.featured);
+  } catch (error) {
+    console.error('Exception fetching featured projects:', error);
+    return FALLBACK_PROJECTS.filter(p => p.featured);
+  }
+}
+
 export async function getProjectById(id: string): Promise<Project | null> {
   try {
     const { data, error } = await supabase
@@ -209,6 +230,7 @@ export async function createProject(project: Omit<Project, 'id' | 'created_at' |
   
   if (error) throw error;
   revalidatePath('/');
+  revalidatePath('/projects');
   return data;
 }
 
@@ -222,6 +244,7 @@ export async function updateProject(id: string, project: Partial<Omit<Project, '
   
   if (error) throw error;
   revalidatePath('/');
+  revalidatePath('/projects');
   return data;
 }
 
@@ -233,6 +256,7 @@ export async function deleteProject(id: string): Promise<void> {
   
   if (error) throw error;
   revalidatePath('/');
+  revalidatePath('/projects');
 }
 
 // SERVICES

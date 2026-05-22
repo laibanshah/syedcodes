@@ -5,6 +5,7 @@ import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import Tilt from "react-parallax-tilt";
+import Link from "next/link";
 
 interface Project {
   id: string;
@@ -13,6 +14,7 @@ interface Project {
   link: string;
   image_url: string | null;
   tech_stack: string[];
+  featured: boolean;
 }
 
 interface ProjectsProps {
@@ -74,7 +76,13 @@ export default function Projects({ projects }: ProjectsProps) {
           transition={{ delay: 0.4 }}
           className="flex flex-wrap justify-center gap-3 mb-12 md:mb-16"
         >
-          {["All", "Web", "Mobile", "Design"].map((filter) => (
+          <Link
+            href="/projects"
+            className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          >
+            All Projects
+          </Link>
+          {["Web", "Mobile", "Design"].map((filter) => (
             <button
               key={filter}
               className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground hover:border-primary"

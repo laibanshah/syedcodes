@@ -7,10 +7,10 @@ import LanternOfLight from "@/components/LanternOfLight";
 import WorkPolicy from "@/components/WorkPolicy";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import { getProjects, getAboutSection, getSetting } from "@/lib/db";
+import { getFeaturedProjects, getAboutSection, getSetting } from "@/lib/db";
 
 export default async function Home() {
-  const projects = await getProjects();
+  const projects = await getFeaturedProjects();
   const about = await getAboutSection();
   const heroSettings = await getSetting("hero");
   const socialSettings = await getSetting("social_links");

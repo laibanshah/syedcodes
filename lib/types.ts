@@ -5,6 +5,7 @@ export interface Project {
   link: string;
   image_url: string | null;
   tech_stack: string[];
+  featured: boolean;
   created_at: string;
   updated_at: string;
 }
