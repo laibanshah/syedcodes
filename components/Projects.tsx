@@ -110,55 +110,62 @@ export default function Projects({ projects }: ProjectsProps) {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="relative"
               >
-                <Tilt
-                  glareEnable={true}
-                  glareMaxOpacity={0.15}
-                  glareColor="#ffffff"
-                  glarePosition="all"
-                  glareBorderRadius="24px"
-                  scale={1.02}
-                  transitionSpeed={500}
-                  tiltMaxAngleX={8}
-                  tiltMaxAngleY={8}
-                  className="relative"
+                <a
+                  href={currentProject.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
                 >
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-border/30">
-                    {/* Layered depth effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 pointer-events-none" />
-                    
-                    {currentProject.image_url ? (
-                      <Image
-                        src={currentProject.image_url}
-                        alt={currentProject.title}
-                        width={800}
-                        height={600}
-                        className="w-full h-auto object-cover rounded-3xl"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full aspect-[4/3] bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
-                        <span className="text-4xl font-bold text-primary/30">{currentProject.title[0]}</span>
+                  <Tilt
+                    glareEnable={true}
+                    glareMaxOpacity={0.15}
+                    glareColor="#ffffff"
+                    glarePosition="all"
+                    glareBorderRadius="24px"
+                    scale={1.02}
+                    transitionSpeed={500}
+                    tiltMaxAngleX={8}
+                    tiltMaxAngleY={8}
+                    className="relative"
+                  >
+                    <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-border/30 cursor-pointer hover:shadow-primary/30 transition-shadow duration-300">
+                      {/* Layered depth effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 pointer-events-none" />
+                      
+                      {currentProject.image_url ? (
+                        <Image
+                          src={currentProject.image_url}
+                          alt={currentProject.title}
+                          width={800}
+                          height={600}
+                          className="w-full h-auto object-cover rounded-3xl"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full aspect-[4/3] bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                          <span className="text-4xl font-bold text-primary/30">{currentProject.title[0]}</span>
+                        </div>
+                      )}
+                      
+                      {/* Floating badge */}
+                      <div className="absolute top-4 right-4 bg-white/90 dark:bg-card/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
+                        <span className="text-xs font-bold text-primary">Featured</span>
                       </div>
-                    )}
-                    
-                    {/* Floating badge */}
-                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-card/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
-                      <span className="text-xs font-bold text-primary">Featured</span>
                     </div>
-                  </div>
-                </Tilt>
+                  </Tilt>
+                </a>
 
                 {/* Navigation arrows */}
                 <div className="flex justify-center gap-4 mt-8">
                   <button
-                    onClick={prevProject}
+                    onClick={(e) => { e.preventDefault(); prevProject(); }}
                     className="p-3 rounded-full bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-border/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
                     aria-label="Previous project"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={nextProject}
+                    onClick={(e) => { e.preventDefault(); nextProject(); }}
                     className="p-3 rounded-full bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-border/30 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg"
                     aria-label="Next project"
                   >
