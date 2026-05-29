@@ -1,22 +1,35 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Monitor, Globe, Server, Lock, PenTool, Briefcase, Code, Database, Smartphone, Layout } from "lucide-react";
+import {
+  Monitor,
+  Globe,
+  Server,
+  Lock,
+  PenTool,
+  Briefcase,
+  Code,
+  Database,
+  Smartphone,
+  Layout,
+} from "lucide-react";
 import { Service } from "@/lib/types";
 import { getServices } from "@/lib/db";
 import { useEffect, useState } from "react";
+import SectionHeader from "@/components/SectionHeader";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 const iconMap: Record<string, React.ReactNode> = {
-  Globe: <Globe className="w-8 h-8 text-primary" />,
-  Monitor: <Monitor className="w-8 h-8 text-primary" />,
-  Server: <Server className="w-8 h-8 text-primary" />,
-  Lock: <Lock className="w-8 h-8 text-primary" />,
-  PenTool: <PenTool className="w-8 h-8 text-primary" />,
-  Briefcase: <Briefcase className="w-8 h-8 text-primary" />,
-  Code: <Code className="w-8 h-8 text-primary" />,
-  Database: <Database className="w-8 h-8 text-primary" />,
-  Smartphone: <Smartphone className="w-8 h-8 text-primary" />,
-  Layout: <Layout className="w-8 h-8 text-primary" />,
+  Globe: <Globe className="w-5 h-5" strokeWidth={1.5} />,
+  Monitor: <Monitor className="w-5 h-5" strokeWidth={1.5} />,
+  Server: <Server className="w-5 h-5" strokeWidth={1.5} />,
+  Lock: <Lock className="w-5 h-5" strokeWidth={1.5} />,
+  PenTool: <PenTool className="w-5 h-5" strokeWidth={1.5} />,
+  Briefcase: <Briefcase className="w-5 h-5" strokeWidth={1.5} />,
+  Code: <Code className="w-5 h-5" strokeWidth={1.5} />,
+  Database: <Database className="w-5 h-5" strokeWidth={1.5} />,
+  Smartphone: <Smartphone className="w-5 h-5" strokeWidth={1.5} />,
+  Layout: <Layout className="w-5 h-5" strokeWidth={1.5} />,
 };
 
 export default function Services() {
@@ -38,62 +51,49 @@ export default function Services() {
     }
   };
 
-  if (loading) {
+  if (loading || !services.length) {
     return null;
   }
 
   return (
-    <section id="services" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background pointer-events-none" />
-      
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center mb-16 md:mb-20">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
-          >
-            Expertise & <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Services</span>
-          </motion.h2>
-          <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            whileInView={{ opacity: 1, width: "80px" }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="h-1 bg-gradient-to-r from-primary to-purple-600 mx-auto mb-8 rounded-full"
-          />
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg"
-          >
-            Delivering high-end digital solutions tailored to elevate your brand.
-          </motion.p>
-        </div>
+    <section id="services" className="section-padding relative border-t border-white/[0.06]">
+      <div className="container-premium">
+        <SectionHeader
+          label="Services"
+          title="Expertise tailored to elevate your brand"
+          description="High-end digital solutions — from concept to production — delivered with clarity and craft."
+          align="center"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {services.map((service, index) => (
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          {services.map((service) => (
             <motion.div
               key={service.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className="bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 p-8 rounded-3xl hover:border-primary/50 transition-all duration-300 group shadow-xl"
+              variants={staggerItem}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="premium-card p-8 md:p-10 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:from-primary/30 group-hover:to-purple-500/30 transition-all duration-300">
-                {iconMap[service.icon_name] || <Globe className="w-8 h-8 text-primary" />}
+              <div className="w-12 h-12 flex items-center justify-center border border-white/10 rounded-lg mb-8 text-brand group-hover:border-brand/40 transition-colors">
+                {iconMap[service.icon_name] || (
+                  <Globe className="w-5 h-5" strokeWidth={1.5} />
+                )}
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">{service.title}</h3>
-              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{service.description}</p>
+              <h3 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-4">
+                {service.title}
+              </h3>
+              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+                {service.description}
+              </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

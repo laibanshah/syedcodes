@@ -1,21 +1,31 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, MessageCircle } from "lucide-react";
-import { FaWhatsapp, FaYoutube, FaGithub, FaLinkedin, FaInstagram, FaTwitter, FaFacebook } from "react-icons/fa";
+import { Mail } from "lucide-react";
+import {
+  FaWhatsapp,
+  FaYoutube,
+  FaGithub,
+  FaLinkedin,
+  FaInstagram,
+  FaTwitter,
+  FaFacebook,
+} from "react-icons/fa";
 import { ContactLink } from "@/lib/types";
 import { getContactLinks } from "@/lib/db";
 import { useEffect, useState } from "react";
+import SectionHeader from "@/components/SectionHeader";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 const iconMap: Record<string, React.ReactNode> = {
-  FaLinkedin: <FaLinkedin className="w-6 h-6" />,
-  FaGithub: <FaGithub className="w-6 h-6" />,
-  FaInstagram: <FaInstagram className="w-6 h-6" />,
-  FaYoutube: <FaYoutube className="w-6 h-6" />,
-  FaWhatsapp: <FaWhatsapp className="w-6 h-6" />,
-  Mail: <Mail className="w-6 h-6" />,
-  Twitter: <FaTwitter className="w-6 h-6" />,
-  FaFacebook: <FaFacebook className="w-6 h-6" />,
+  FaLinkedin: <FaLinkedin className="w-5 h-5" />,
+  FaGithub: <FaGithub className="w-5 h-5" />,
+  FaInstagram: <FaInstagram className="w-5 h-5" />,
+  FaYoutube: <FaYoutube className="w-5 h-5" />,
+  FaWhatsapp: <FaWhatsapp className="w-5 h-5" />,
+  Mail: <Mail className="w-5 h-5" strokeWidth={1.5} />,
+  Twitter: <FaTwitter className="w-5 h-5" />,
+  FaFacebook: <FaFacebook className="w-5 h-5" />,
 };
 
 export default function Contact() {
@@ -42,62 +52,58 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background pointer-events-none" />
-      
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="max-w-5xl mx-auto text-center">
+    <section id="contact" className="section-padding relative border-t border-white/[0.06]">
+      <div className="container-premium">
+        <div className="max-w-4xl mx-auto text-center">
+          <SectionHeader
+            label="Contact"
+            title="Let's build something extraordinary"
+            description="Whether you need a dynamic web app, a refined portfolio, or a high-end corporate presence — I'm ready to bring your vision to life."
+            align="center"
+          />
+
+          {contactLinks.length > 0 && (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16 md:mb-20"
+            >
+              {contactLinks.map((link) => (
+                <motion.a
+                  key={link.id}
+                  variants={staggerItem}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="premium-card inline-flex items-center gap-3 px-6 py-4 hover:border-white/20 transition-colors group"
+                >
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                    {iconMap[link.icon_name] || <Mail className="w-5 h-5" />}
+                  </span>
+                  <span className="text-sm font-medium tracking-wide">{link.platform}</span>
+                </motion.a>
+              ))}
+            </motion.div>
+          )}
+
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7 }}
+            className="premium-card p-10 md:p-14 max-w-2xl mx-auto"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Let's Build Something <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Extraordinary</span>
-            </h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-primary to-purple-600 mx-auto mb-8 rounded-full" />
-            <p className="text-muted-foreground text-lg md:text-xl mb-12 leading-relaxed max-w-3xl mx-auto">
-              Whether you need a fully functional dynamic web app, a stunning portfolio, or a high-end corporate presence, I am ready to bring your vision to life.
+            <h3 className="text-2xl md:text-3xl font-heading font-semibold mb-4">
+              Ready to start?
+            </h3>
+            <p className="text-muted-foreground mb-8 text-base md:text-lg leading-relaxed">
+              Reach out directly via email or WhatsApp for a consultation.
             </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-4 md:gap-6"
-          >
-            {contactLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-6 py-4 rounded-full bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 hover:border-primary/50 hover:bg-white/80 dark:hover:bg-card/80 text-foreground transition-all duration-300 group shadow-lg hover:shadow-xl hover:shadow-primary/10"
-              >
-                <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                  {iconMap[link.icon_name] || <Mail className="w-6 h-6" />}
-                </div>
-                <span className="font-semibold">{link.platform}</span>
-              </a>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-16 md:mt-20 p-8 md:p-12 rounded-3xl bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 max-w-3xl mx-auto shadow-xl"
-          >
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Ready to start?</h3>
-            <p className="text-muted-foreground mb-8 text-base md:text-lg">Reach out directly via email or WhatsApp for a consultation.</p>
             <a
               href="mailto:lanternoflight11@gmail.com"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/30"
+              className="btn-primary rounded-full"
             >
               lanternoflight11@gmail.com
             </a>

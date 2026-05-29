@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Code2, Layout, Database, Smartphone } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
+import { staggerContainer, staggerItem } from "@/lib/motion";
 
 const skills = [
   { name: "React", level: 95 },
@@ -12,6 +14,13 @@ const skills = [
   { name: "Tailwind CSS", level: 95 },
 ];
 
+const pillars = [
+  { icon: Layout, label: "UI/UX Focused" },
+  { icon: Code2, label: "Clean Code" },
+  { icon: Database, label: "Data-Driven" },
+  { icon: Smartphone, label: "Responsive" },
+];
+
 interface AboutProps {
   title?: string;
   content?: string;
@@ -19,91 +28,75 @@ interface AboutProps {
 
 export default function About({ title, content }: AboutProps) {
   return (
-    <section id="about" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background pointer-events-none" />
-      
-      <div className="container mx-auto px-4 md:px-6 z-10 relative">
-        <div className="max-w-6xl mx-auto">
+    <section id="about" className="section-padding relative border-t border-white/[0.06]">
+      <div className="container-premium">
+        <SectionHeader
+          label="About"
+          title={title || "Building with purpose and precision"}
+          description={
+            content ||
+            "I craft premium, cinematic, and responsive experiences where every detail serves the story — performance, accessibility, and design discipline included."
+          }
+        />
+
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="mb-16 md:mb-20 text-center"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="lg:col-span-5 flex flex-col gap-4"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              About <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Me</span>
-            </h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-primary to-purple-600 mx-auto mb-8 rounded-full" />
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              {content || "I am a passionate web developer specializing in building premium, cinematic, and responsive static and dynamic websites. My client-focused approach ensures every pixel is perfect and every interaction feels professional."}
-            </p>
+            {pillars.map(({ icon: Icon, label }) => (
+              <motion.div
+                key={label}
+                variants={staggerItem}
+                className="premium-card flex items-center gap-4 p-5 md:p-6 group"
+              >
+                <div className="flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg shrink-0 group-hover:border-brand/40 transition-colors">
+                  <Icon className="w-5 h-5 text-brand" strokeWidth={1.5} />
+                </div>
+                <span className="text-sm md:text-base font-medium text-foreground tracking-wide">
+                  {label}
+                </span>
+              </motion.div>
+            ))}
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
-            {/* Philosophy */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 p-8 md:p-10 rounded-3xl shadow-xl"
-            >
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-6">My Approach</h3>
-              <p className="text-muted-foreground mb-8 leading-relaxed text-base md:text-lg">
-                Development isn't just about writing code; it's about crafting an experience. I build web applications with a focus on aesthetics, performance, and scalability.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 text-sm md:text-base text-foreground font-medium p-3 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-xl">
-                  <div className="p-2 bg-white/80 dark:bg-card/80 rounded-lg text-primary"><Layout size={18} /></div>
-                  UI/UX Focused
-                </div>
-                <div className="flex items-center gap-3 text-sm md:text-base text-foreground font-medium p-3 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-xl">
-                  <div className="p-2 bg-white/80 dark:bg-card/80 rounded-lg text-primary"><Code2 size={18} /></div>
-                  Clean Code
-                </div>
-                <div className="flex items-center gap-3 text-sm md:text-base text-foreground font-medium p-3 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-xl">
-                  <div className="p-2 bg-white/80 dark:bg-card/80 rounded-lg text-primary"><Database size={18} /></div>
-                  Data-Driven
-                </div>
-                <div className="flex items-center gap-3 text-sm md:text-base text-foreground font-medium p-3 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-xl">
-                  <div className="p-2 bg-white/80 dark:bg-card/80 rounded-lg text-primary"><Smartphone size={18} /></div>
-                  Responsive
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Skills */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 p-8 md:p-10 rounded-3xl shadow-xl"
-            >
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Technical Arsenal</h3>
-              <div className="space-y-6">
-                {skills.map((skill, index) => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between text-sm md:text-base mb-2">
-                      <span className="text-foreground font-semibold">{skill.name}</span>
-                      <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold">{skill.level}%</span>
-                    </div>
-                    <div className="h-3 w-full bg-secondary/50 rounded-full overflow-hidden border border-border/30">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${skill.level}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, delay: index * 0.1, ease: "easeOut" }}
-                        className="h-full bg-gradient-to-r from-primary to-purple-600 rounded-full"
-                      />
-                    </div>
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-7 premium-card p-8 md:p-10 lg:p-12"
+          >
+            <h3 className="text-xl md:text-2xl font-heading font-semibold mb-8">
+              Technical focus
+            </h3>
+            <div className="space-y-7">
+              {skills.map((skill, index) => (
+                <div key={skill.name}>
+                  <div className="flex justify-between text-sm mb-3">
+                    <span className="text-foreground font-medium">{skill.name}</span>
+                    <span className="text-muted-foreground tabular-nums">{skill.level}%</span>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
+                  <div className="h-px w-full bg-white/[0.08] overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.level}%` }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 1.2,
+                        delay: index * 0.08,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="h-full bg-brand"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Code2 } from "lucide-react";
 import Image from "next/image";
+import { fadeUp } from "@/lib/motion";
+import HeroAccentWord from "@/components/HeroAccentWord";
+import BeamButton from "@/components/BeamButton";
 
 interface HeroProps {
   title?: string;
@@ -10,11 +12,30 @@ interface HeroProps {
   video?: string;
 }
 
-export default function Hero({ title, subtitle, video }: HeroProps) {
+function DefaultHeroHeadline() {
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
-      {/* Premium Background Effects */}
-      <div className="absolute inset-0 z-0">
+    <h1 className="text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] xl:text-[5rem] font-heading font-semibold text-foreground leading-[1.02] tracking-[-0.02em]">
+      <span className="block">We build</span>
+      <span className="block mt-1 md:mt-2">
+        <HeroAccentWord variant="default">digital</HeroAccentWord>{" "}
+        <HeroAccentWord variant="long">experiences</HeroAccentWord>
+      </span>
+      <span className="block mt-1 md:mt-2">
+        for <HeroAccentWord variant="wave">ambitious</HeroAccentWord> brands.
+      </span>
+    </h1>
+  );
+}
+
+export default function Hero({ title, subtitle, video }: HeroProps) {
+  const displaySubtitle = subtitle || title;
+
+  return (
+    <section
+      id="home"
+      className="relative min-h-screen flex items-end md:items-center pt-28 pb-20 md:pb-24 overflow-hidden"
+    >
+      <div className="absolute inset-0 z-0 pointer-events-none">
         {video ? (
           <video
             src={video}
@@ -22,143 +43,134 @@ export default function Hero({ title, subtitle, video }: HeroProps) {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-10"
+            className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
           />
         ) : (
           <>
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full blur-[150px]" />
-            <div className="absolute bottom-1/4 right-1/4 w-[40rem] h-[40rem] bg-gradient-to-r from-purple-500/10 to-primary/10 rounded-full blur-[180px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 rounded-full blur-[200px]" />
+            <div className="absolute top-0 right-0 w-[55%] h-[70%] glow-brand opacity-70" />
+            <div className="absolute bottom-0 left-0 w-[40%] h-[50%] bg-[radial-gradient(ellipse_at_bottom_left,rgba(212,255,74,0.07),transparent_60%)]" />
+            <div
+              className="absolute inset-0 opacity-[0.22]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+                backgroundSize: "72px 72px",
+              }}
+            />
           </>
         )}
+        <div className="absolute inset-0 grain-overlay" />
       </div>
 
-      <div className="container mx-auto px-4 z-10 grid lg:grid-cols-2 gap-12 items-center">
-        <div className="flex flex-col items-start text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex items-center gap-3 mb-6"
-          >
-            <div className="w-12 h-[2px] bg-gradient-to-r from-primary to-purple-600" />
-            <h2 className="text-primary text-sm tracking-widest uppercase font-bold flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              Premium Web Development
-            </h2>
-          </motion.div>
-          
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight mb-6 tracking-tight"
-          >
-            {title || (
-              <>
-                Welcome to <br />
-                <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  SyedCodes.UI
-                </span>
-              </>
-            )}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 leading-relaxed"
-          >
-            {subtitle || "Crafting luxury modern layouts, responsive web applications, and digital experiences that leave a lasting impression."}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-            className="flex flex-wrap gap-4"
-          >
-            <a
-              href="#projects"
-              className="group flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/30"
+      <div className="container-premium relative z-10 w-full">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-end lg:items-center">
+          <div className="lg:col-span-7 flex flex-col">
+            <motion.p
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0}
+              className="font-mono text-[11px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-10"
             >
-              View Projects
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#contact"
-              className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-foreground border border-border bg-white/50 dark:bg-card/50 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-card/80 transition-all"
-            >
-              Contact Me
-            </a>
-          </motion.div>
+              <span className="text-brand">[01]</span>{" "}
+              <span className="text-muted-foreground/80">Digital Design Studio</span>
+            </motion.p>
 
-          {/* Stats */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0.1}
+            >
+              <DefaultHeroHeadline />
+            </motion.div>
+
+            <motion.p
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0.2}
+              className="mt-8 md:mt-10 text-muted-foreground text-base md:text-lg max-w-lg leading-relaxed"
+            >
+              {displaySubtitle ||
+                "Websites, branding, software and mobile apps — digital products for brands with ambition."}
+            </motion.p>
+
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0.3}
+              className="flex flex-wrap items-center gap-4 mt-10 md:mt-12"
+            >
+              <BeamButton href="#contact" variant="primary">
+                Start a project
+              </BeamButton>
+              <BeamButton
+                href="#projects"
+                variant="secondary"
+                icon={
+                  <span className="w-2.5 h-2.5 bg-brand shadow-[0_0_12px_var(--brand-glow)]" />
+                }
+              >
+                Selected work
+              </BeamButton>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0.4}
+              className="hidden md:flex gap-12 lg:gap-16 mt-16 lg:mt-20 pt-10 border-t border-white/[0.08]"
+            >
+              {[
+                { value: "50+", label: "Projects" },
+                { value: "5+", label: "Years" },
+                { value: "100%", label: "Commitment" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-2xl lg:text-3xl font-heading font-semibold text-foreground">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-            className="flex gap-8 mt-12"
+            transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 flex justify-center lg:justify-end"
           >
-            <div>
-              <p className="text-3xl font-bold text-foreground">50+</p>
-              <p className="text-sm text-muted-foreground">Projects</p>
-            </div>
-            <div className="w-px bg-border/50" />
-            <div>
-              <p className="text-3xl font-bold text-foreground">5+</p>
-              <p className="text-sm text-muted-foreground">Years Exp</p>
-            </div>
-            <div className="w-px bg-border/50" />
-            <div>
-              <p className="text-3xl font-bold text-foreground">100%</p>
-              <p className="text-sm text-muted-foreground">Satisfaction</p>
+            <div className="relative w-64 h-80 sm:w-72 sm:h-96 md:w-80 md:h-[28rem] lg:w-[22rem] lg:h-[30rem]">
+              <div className="absolute -inset-6 glow-brand rounded-full blur-2xl opacity-90" />
+              <div className="absolute inset-0 border border-brand/25 rounded-2xl translate-x-3 translate-y-3" />
+              <div className="relative w-full h-full overflow-hidden rounded-2xl border border-white/[0.12] bg-card ring-1 ring-brand/10">
+                <Image
+                  src="/assets/myimage.jpg"
+                  alt="SyedCodes.UI"
+                  fill
+                  className="object-cover object-center"
+                  priority
+                />
+              </div>
+              <div className="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 premium-card px-5 py-3 border-brand/20">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-brand font-semibold">
+                  Status
+                </p>
+                <p className="text-sm font-medium text-foreground mt-0.5 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+                  Available for work
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative lg:ml-auto flex justify-center"
-        >
-          <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] rounded-full p-1 bg-gradient-to-br from-primary/30 via-purple-500/30 to-primary/30 backdrop-blur-sm shadow-2xl">
-            <div className="w-full h-full rounded-full overflow-hidden border-4 border-background relative bg-white/50 dark:bg-card/50 backdrop-blur-xl">
-              <Image
-                src="/assets/myimage.jpg"
-                alt="SyedCodes.UI Profile"
-                fill
-                className="object-cover object-center transition-all duration-700"
-                priority
-              />
-            </div>
-            
-            {/* Decorative orbit */}
-            <div className="absolute inset-0 rounded-full border border-dashed border-primary/30 animate-[spin_20s_linear_infinite]" />
-            <div className="absolute inset-4 rounded-full border border-dotted border-purple-500/30 animate-[spin_25s_linear_infinite_reverse]" />
-            
-            {/* Floating badges */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 1 }}
-              className="absolute -top-2 -right-2 md:-top-4 md:-right-4 bg-white/90 dark:bg-card/90 backdrop-blur-md px-4 py-2 md:px-6 md:py-3 rounded-2xl shadow-xl border border-border/30"
-            >
-              <p className="text-xs md:text-sm font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Available for Work</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
-              className="absolute -bottom-2 -left-2 md:-bottom-4 md:-left-4 bg-white/90 dark:bg-card/90 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl border border-border/30"
-            >
-              <Code2 className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-            </motion.div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

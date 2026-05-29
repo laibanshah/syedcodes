@@ -1,113 +1,122 @@
 import { getProjects } from "@/lib/db";
 import Image from "next/image";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ArrowUpRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Link 
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      <main className="flex-1 pt-28 md:pt-32">
+        <section className="section-padding pb-12 md:pb-16 border-b border-white/[0.06]">
+          <div className="container-premium">
+            <Link
               href="/"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-12"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Home
+              Back to home
             </Link>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
-              All <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Projects</span>
+            <p className="label-studio mb-6">Portfolio</p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-semibold text-foreground leading-tight max-w-4xl">
+              All <span className="text-brand">projects</span>
             </h1>
-            <p className="text-xl text-muted-foreground">
-              A complete collection of digital experiences crafted with precision and care
+            <p className="mt-6 md:mt-8 text-muted-foreground text-lg md:text-xl max-w-2xl leading-relaxed">
+              A complete collection of digital experiences crafted with precision and care.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Projects List */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+        <section className="section-padding pt-0">
+          <div className="container-premium">
             {projects.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">No projects yet. Check back soon!</p>
+              <div className="text-center py-20 premium-card">
+                <p className="text-muted-foreground text-lg">
+                  No projects yet. Check back soon!
+                </p>
               </div>
             ) : (
-              <div className="space-y-12">
+              <div className="flex flex-col gap-12 md:gap-16 lg:gap-20">
                 {projects.map((project, index) => (
-                  <div
+                  <article
                     key={project.id}
-                    className={`flex flex-col md:flex-row gap-8 items-center bg-white/60 dark:bg-card/60 backdrop-blur-xl border border-border/30 rounded-3xl p-6 md:p-8 shadow-xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 ${
-                      index % 2 === 0 ? '' : 'md:flex-row-reverse'
+                    className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center ${
+                      index % 2 === 1 ? "lg:[direction:rtl]" : ""
                     }`}
                   >
-                    {/* Project Image */}
-                    <div className="w-full md:w-1/2">
-                      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-purple-500/10 aspect-video">
-                        {project.image_url ? (
-                          <Image
-                            src={project.image_url}
-                            alt={project.title}
-                            width={800}
-                            height={600}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-6xl font-bold text-primary/30">{project.title[0]}</span>
-                          </div>
-                        )}
-                        {project.featured && (
-                          <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold">
-                            Featured
-                          </div>
-                        )}
-                      </div>
+                    <div
+                      className={`lg:col-span-7 premium-card overflow-hidden aspect-[16/10] relative ${
+                        index % 2 === 1 ? "lg:[direction:ltr]" : ""
+                      }`}
+                    >
+                      {project.image_url ? (
+                        <Image
+                          src={project.image_url}
+                          alt={project.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 60vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted min-h-[240px]">
+                          <span className="text-6xl font-heading font-semibold text-white/10">
+                            {project.title[0]}
+                          </span>
+                        </div>
+                      )}
+                      {project.featured && (
+                        <span className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 border border-white/20 bg-black/50 text-foreground">
+                          Featured
+                        </span>
+                      )}
                     </div>
 
-                    {/* Project Details */}
-                    <div className="w-full md:w-1/2 flex flex-col justify-center">
-                      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                    <div
+                      className={`lg:col-span-5 flex flex-col ${
+                        index % 2 === 1 ? "lg:[direction:ltr]" : ""
+                      }`}
+                    >
+                      <span className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-4">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <h2 className="text-3xl md:text-4xl font-heading font-semibold text-foreground mb-5">
                         {project.title}
                       </h2>
-                      <p className="text-muted-foreground leading-relaxed mb-6">
+                      <p className="text-muted-foreground leading-relaxed mb-6 text-base md:text-lg">
                         {project.description}
                       </p>
-                      
-                      {/* Tech Stack */}
-                      <div className="flex flex-wrap gap-2 mb-6">
+                      <div className="flex flex-wrap gap-2 mb-8">
                         {project.tech_stack.map((tech) => (
                           <span
                             key={tech}
-                            className="px-3 py-1 bg-gradient-to-r from-primary/10 to-purple-500/10 border border-border/50 rounded-full text-sm font-medium text-foreground"
+                            className="px-3 py-1.5 text-xs uppercase tracking-wider text-muted-foreground border border-white/10 rounded-full"
                           >
                             {tech}
                           </span>
                         ))}
                       </div>
-
-                      {/* Visit Button */}
                       <a
                         href={project.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 w-fit"
+                        className="btn-primary rounded-full w-fit"
                       >
-                        Visit Project <ExternalLink size={18} />
+                        Visit project
+                        <ArrowUpRight className="w-4 h-4" />
                       </a>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <Footer />
     </div>
   );
 }

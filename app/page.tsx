@@ -15,8 +15,7 @@ export default async function Home() {
   const heroSettings = await getSetting("hero");
   const socialSettings = await getSetting("social_links");
 
-  // Transform social settings to the format expected by components
-  const socialLinks = socialSettings?.value 
+  const socialLinks = socialSettings?.value
     ? Object.entries(socialSettings.value).map(([platform, url]) => ({
         platform: platform.charAt(0).toUpperCase() + platform.slice(1),
         url: url as string,
@@ -24,21 +23,21 @@ export default async function Home() {
     : undefined;
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-screen bg-background">
       <Navbar socialLinks={socialLinks} />
       <div className="flex-1">
-        <Hero 
-          title={heroSettings?.value?.title} 
-          subtitle={heroSettings?.value?.subtitle} 
+        <Hero
+          title={heroSettings?.value?.title}
+          subtitle={heroSettings?.value?.subtitle}
         />
-        <About 
-          title={about?.title || undefined} 
-          content={about?.content || undefined} 
+        <Projects projects={projects} />
+        <About
+          title={about?.title || undefined}
+          content={about?.content || undefined}
         />
         <Services />
-        <Projects projects={projects} />
-        <LanternOfLight />
         <WorkPolicy />
+        <LanternOfLight />
         <Contact />
       </div>
       <Footer socialLinks={socialLinks} />

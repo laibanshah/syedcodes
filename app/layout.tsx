@@ -1,24 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
 import Script from "next/script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-accent",
   subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "SyedCodes.UI | Premium Web Development Portfolio",
-  description: "Personal portfolio for SyedCodes.UI showcasing luxury web development, React, Next.js, and client-focused solutions.",
+  description:
+    "Personal portfolio for SyedCodes.UI showcasing luxury web development, React, Next.js, and client-focused solutions.",
 };
 
 export default function RootLayout({
@@ -30,11 +35,19 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+      className={`${inter.variable} ${instrumentSerif.variable} dark`}
     >
-      <head />
-      <body className="min-h-full flex flex-col font-sans bg-background text-foreground selection:bg-gold selection:text-charcoal-900">
-        <Script src="https://identity.netlify.com/v1/netlify-identity-widget.js" strategy="afterInteractive" />
+      <head>
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+        <Script
+          src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+          strategy="afterInteractive"
+        />
         <Script id="netlify-identity-widget-init" strategy="afterInteractive">
           {`
             if (window.netlifyIdentity) {
@@ -48,10 +61,15 @@ export default function RootLayout({
             }
           `}
         </Script>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
           <SmoothScroll>
             {children}
-            <Toaster position="bottom-right" />
+            <Toaster position="bottom-right" theme="dark" />
           </SmoothScroll>
         </ThemeProvider>
       </body>
