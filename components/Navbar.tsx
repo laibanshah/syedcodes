@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 interface NavLink {
@@ -13,12 +14,12 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { name: "Work", href: "#projects" },
-  { name: "About", href: "#about" },
-  { name: "Services", href: "#services" },
-  { name: "Process", href: "#process" },
+  { name: "Work", href: "/#projects" },
+  { name: "About", href: "/#about" },
+  { name: "Services", href: "/#services" },
+  { name: "Process", href: "/#process" },
   { name: "Pricing", href: "/pricing", external: true },
-  { name: "Contact", href: "#contact" },
+  { name: "Contact", href: "/#contact" },
   { name: "All Projects", href: "/projects", external: true },
 ];
 
@@ -32,6 +33,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({}: NavbarProps) {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -50,9 +52,22 @@ export default function Navbar({}: NavbarProps) {
       setIsMobileMenuOpen(false);
       return;
     }
+    
+    // Extract the hash from the href (handles both #section and /#section)
+    const hash = href.includes("#") ? href.substring(href.indexOf("#")) : href;
+    
+    // If not on homepage, let the link navigate to homepage with hash
+    if (pathname !== "/") {
+      e.preventDefault();
+      setIsMobileMenuOpen(false);
+      window.location.href = href;
+      return;
+    }
+    
+    // On homepage, prevent default and smooth scroll
     e.preventDefault();
     setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
+    const element = document.querySelector(hash);
     if (element) {
       const top = element.getBoundingClientRect().top + window.scrollY - 88;
       window.scrollTo({ top, behavior: "smooth" });
@@ -78,7 +93,7 @@ export default function Navbar({}: NavbarProps) {
           )}
         >
           <Link
-            href="#home"
+            href="/#home"
             onClick={(e) => scrollToSection(e, "#home")}
             className="text-sm md:text-base font-heading font-semibold tracking-tight text-foreground group"
           >
@@ -104,7 +119,7 @@ export default function Navbar({}: NavbarProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href="#contact"
+              href="/#contact"
               onClick={(e) => scrollToSection(e, "#contact")}
               className="hidden md:inline-flex btn-primary rounded-full !py-2.5 !px-6 text-xs uppercase tracking-widest"
             >
@@ -131,7 +146,7 @@ export default function Navbar({}: NavbarProps) {
           >
             <div className="container-premium py-6 flex flex-col gap-1">
               <a
-                href="#home"
+                href="/#home"
                 onClick={(e) => scrollToSection(e, "#home")}
                 className="py-3 text-sm uppercase tracking-widest text-muted-foreground hover:text-brand"
               >

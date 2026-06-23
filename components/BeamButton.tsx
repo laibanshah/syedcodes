@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 interface BeamButtonProps {
@@ -21,10 +22,17 @@ export default function BeamButton({
   className,
   onClick,
 }: BeamButtonProps) {
+  const pathname = usePathname();
   const isPrimary = variant === "primary";
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (href.startsWith("#")) {
+      // If not on homepage, let the link navigate to homepage with hash
+      if (pathname !== "/") {
+        onClick?.(e);
+        return;
+      }
+      // On homepage, prevent default and smooth scroll
       e.preventDefault();
       const el = document.querySelector(href);
       if (el) {

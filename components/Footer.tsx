@@ -36,19 +36,19 @@ export default function Footer({ socialLinks }: FooterProps) {
             {!socialLinks && (
               <>
                 <a
-                  href="#home"
+                  href="/#home"
                   className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-brand transition-colors"
                 >
                   Home
                 </a>
                 <a
-                  href="#projects"
+                  href="/#projects"
                   className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-brand transition-colors"
                 >
                   Work
                 </a>
                 <a
-                  href="#contact"
+                  href="/#contact"
                   className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-brand transition-colors"
                 >
                   Contact

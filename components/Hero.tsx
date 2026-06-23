@@ -103,11 +103,11 @@ export default function Hero({ title, subtitle, video }: HeroProps) {
               custom={0.3}
               className="flex flex-wrap items-center gap-4 mt-10 md:mt-12"
             >
-              <BeamButton href="#contact" variant="primary">
+              <BeamButton href="/#contact" variant="primary">
                 Start a project
               </BeamButton>
               <BeamButton
-                href="#projects"
+                href="/projects"
                 variant="secondary"
                 icon={
                   <span className="w-2.5 h-2.5 bg-brand shadow-[0_0_12px_var(--brand-glow)]" />

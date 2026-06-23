@@ -157,7 +157,7 @@ export default function PricingPage() {
                     </ul>
 
                     <Link
-                      href="#contact"
+                      href="/#contact"
                       className={`inline-flex items-center justify-center gap-2 w-full px-6 py-4 text-sm font-semibold tracking-wide transition-all duration-300 rounded-xl ${
                         tier.featured
                           ? "bg-brand text-[#0a0a0a] hover:bg-brand-dim hover:shadow-[0_0_40px_var(--brand-glow)]"

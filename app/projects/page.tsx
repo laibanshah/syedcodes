@@ -15,7 +15,7 @@ export default async function ProjectsPage() {
         <section className="section-padding pb-12 md:pb-16 border-b border-white/[0.06]">
           <div className="container-premium">
             <Link
-              href="/"
+              href="/#home"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-12"
             >
               <ArrowLeft className="w-4 h-4" />
