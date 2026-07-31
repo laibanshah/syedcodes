@@ -9,9 +9,10 @@ import ServicesTab from "@/components/admin/ServicesTab";
 import AboutTab from "@/components/admin/AboutTab";
 import ContactTab from "@/components/admin/ContactTab";
 import SettingsTab from "@/components/admin/SettingsTab";
+import ResourcesTab from "@/components/admin/ResourcesTab";
 import { toast } from "sonner";
 
-type TabType = "projects" | "services" | "about" | "contact" | "settings";
+type TabType = "projects" | "services" | "about" | "contact" | "settings" | "resources";
 
 export default function AdminPage() {
   const [session, setSession] = useState<any>(null);
@@ -82,6 +83,7 @@ export default function AdminPage() {
     { id: "services" as TabType, label: "Services", icon: <Briefcase className="w-5 h-5" /> },
     { id: "about" as TabType, label: "About", icon: <User className="w-5 h-5" /> },
     { id: "contact" as TabType, label: "Contact", icon: <Link className="w-5 h-5" /> },
+    { id: "resources" as TabType, label: "Resources", icon: <FolderOpen className="w-5 h-5" /> },
     { id: "settings" as TabType, label: "Settings", icon: <SettingsIcon className="w-5 h-5" /> },
   ];
 
@@ -255,8 +257,9 @@ export default function AdminPage() {
               {activeTab === "projects" && <ProjectsTab />}
               {activeTab === "services" && <ServicesTab />}
               {activeTab === "about" && <AboutTab />}
-              {activeTab === "contact" && <ContactTab />}
-              {activeTab === "settings" && <SettingsTab />}
+              { activeTab === "contact" && <ContactTab /> }
+              { activeTab === "resources" && <ResourcesTab /> }
+              { activeTab === "settings" && <SettingsTab /> }
             </motion.div>
           </main>
         </div>

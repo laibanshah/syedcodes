@@ -8,6 +8,8 @@ import WorkPolicy from "@/components/WorkPolicy";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { getFeaturedProjects, getAboutSection, getSetting } from "@/lib/db";
+import CinematicIntroClientWrapper from "@/components/CinematicIntroClientWrapper";
+import { ParticleBall } from "@/components/ParticleBall";
 
 export default async function Home() {
   const projects = await getFeaturedProjects();
@@ -23,9 +25,11 @@ export default async function Home() {
     : undefined;
 
   return (
-    <main className="flex flex-col min-h-screen bg-background">
+    <main className="flex flex-col min-h-screen bg-transparent relative">
+      <CinematicIntroClientWrapper />
+      <ParticleBall />
       <Navbar socialLinks={socialLinks} />
-      <div className="flex-1">
+      <div className="flex-1 relative z-10">
         <Hero
           title={heroSettings?.value?.title}
           subtitle={heroSettings?.value?.subtitle}

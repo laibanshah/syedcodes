@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
 import Script from "next/script";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -59,6 +60,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SmoothScroll>
+            <CustomCursor />
             {children}
             <Toaster position="bottom-right" theme="dark" />
           </SmoothScroll>
