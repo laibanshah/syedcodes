@@ -65,7 +65,7 @@ export default function CinematicIntro({ onComplete }: { onComplete: () => void 
 
       {/* Main Text */}
       <motion.h1
-        className="relative z-20 text-6xl md:text-8xl font-bold tracking-tighter uppercase"
+        className="relative z-20 text-center text-6xl md:text-8xl font-bold tracking-tighter uppercase"
         initial={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
         animate={
           stage === 0

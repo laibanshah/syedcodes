@@ -38,7 +38,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${instrumentSerif.variable} dark`}
+      className={`${inter.variable} ${instrumentSerif.variable} light`}
     >
       <head>
         <link
@@ -57,7 +57,7 @@ export default function RootLayout({
         />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
@@ -73,7 +73,7 @@ export default function RootLayout({
           <SmoothScroll>
             <CustomCursor />
             {children}
-            <Toaster position="bottom-right" theme="dark" />
+            <Toaster position="bottom-right" theme="light" />
           </SmoothScroll>
         </ThemeProvider>
       </body>
