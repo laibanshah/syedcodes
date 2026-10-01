@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import SectionHeader from "@/components/SectionHeader";
 import FeaturedProjectCard from "@/components/FeaturedProjectCard";
 
@@ -22,7 +23,7 @@ export default function Projects({ projects }: ProjectsProps) {
   if (!projects.length) return null;
 
   return (
-    <section id="projects" className="section-padding relative border-t border-white/[0.06]">
+    <section id="projects" className="section-padding relative border-t border-black/[0.06]">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[min(100%,800px)] h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent pointer-events-none" />
 
       <div className="container-premium">
@@ -50,6 +51,16 @@ export default function Projects({ projects }: ProjectsProps) {
               reversed={index % 2 === 1}
             />
           ))}
+        </div>
+
+        <div className="flex justify-center mt-12 md:mt-16">
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-brand/10 border border-brand/30 text-foreground hover:bg-brand/20 transition-all duration-300"
+          >
+            View all projects
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>

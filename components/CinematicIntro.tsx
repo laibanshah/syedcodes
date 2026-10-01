@@ -28,7 +28,7 @@ export default function CinematicIntro({ onComplete }: { onComplete: () => void 
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black text-white"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-white text-foreground"
       initial={{ opacity: 1 }}
       animate={
         stage === 2
@@ -38,26 +38,26 @@ export default function CinematicIntro({ onComplete }: { onComplete: () => void 
       transition={{ duration: 1, ease: "easeInOut" }}
     >
       {/* Grid Background */}
-      <div 
+      <div
         className="absolute inset-0 z-0 opacity-20"
         style={{
           backgroundImage: `
-            linear-gradient(to right, #333 1px, transparent 1px),
-            linear-gradient(to bottom, #333 1px, transparent 1px)
+            linear-gradient(to right, #ccc 1px, transparent 1px),
+            linear-gradient(to bottom, #ccc 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px'
         }}
       />
-      
+
       {/* Cinematic Bars closing */}
       <motion.div
-        className="absolute top-0 left-0 right-0 bg-black z-10"
+        className="absolute top-0 left-0 right-0 bg-white z-10"
         initial={{ height: 0 }}
         animate={stage >= 1 ? { height: "50vh" } : { height: 0 }}
         transition={{ duration: 0.8, ease: "circIn" }}
       />
       <motion.div
-        className="absolute bottom-0 left-0 right-0 bg-black z-10"
+        className="absolute bottom-0 left-0 right-0 bg-white z-10"
         initial={{ height: 0 }}
         animate={stage >= 1 ? { height: "50vh" } : { height: 0 }}
         transition={{ duration: 0.8, ease: "circIn" }}
@@ -79,3 +79,4 @@ export default function CinematicIntro({ onComplete }: { onComplete: () => void 
     </motion.div>
   );
 }
+

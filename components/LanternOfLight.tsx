@@ -67,7 +67,7 @@ export default function LanternOfLight({ content }: LanternOfLightProps = {}) {
               href="https://whatsapp.com/channel/0029VaeYmbP5PO0zmfC6Yl2J"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline rounded-full inline-flex"
+              className="btn-outline rounded-none inline-flex"
             >
               Join WhatsApp community
             </a>

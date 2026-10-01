@@ -54,31 +54,31 @@
 }
 
 :root {
-  --background: #080808;
-  --foreground: #f5f5f5;
-  --card: #111111;
-  --card-foreground: #f5f5f5;
-  --popover: #111111;
-  --popover-foreground: #f5f5f5;
-  --primary: #00ff99;
-  --primary-foreground: #0a0a0a;
-  --secondary: #161616;
-  --secondary-foreground: #e5e5e5;
-  --muted: #141414;
-  --muted-foreground: #9ca3af;
-  --accent: #1a1a1a;
-  --accent-foreground: #f5f5f5;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #f5f5f5;
+  --card-foreground: #0a0a0a;
+  --popover: #f5f5f5;
+  --popover-foreground: #0a0a0a;
+  --primary: #00cc7a;
+  --primary-foreground: #ffffff;
+  --secondary: #e5e5e5;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f0f0f0;
+  --muted-foreground: #6b7280;
+  --accent: #e0e0e0;
+  --accent-foreground: #0a0a0a;
   --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: rgba(0, 255, 153, 0.4);
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.1);
+  --ring: rgba(0, 204, 122, 0.4);
   --radius: 0.75rem;
 
-  --brand: #00ff99;
-  --brand-bright: #33ffbb;
-  --brand-dim: #00cc7a;
-  --brand-muted: rgba(0, 255, 153, 0.14);
-  --brand-glow: rgba(0, 255, 153, 0.35);
+  --brand: #00cc7a;
+  --brand-bright: #00ff99;
+  --brand-dim: #009966;
+  --brand-muted: rgba(0, 204, 122, 0.14);
+  --brand-glow: rgba(0, 204, 122, 0.35);
   --beam-angle: 0deg;
 }
 
@@ -135,7 +135,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -185,13 +185,13 @@
   }
 
   .premium-card {
-    @apply bg-white/[0.01] border border-white/10 rounded-xl transition-all duration-500 backdrop-blur-sm;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    @apply bg-black/[0.01] border border-black/10 rounded-xl transition-all duration-500 backdrop-blur-sm;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   }
 
   .premium-card:hover {
-    @apply bg-white/[0.03] border-brand/40;
-    box-shadow: inset 0 0 0 1px rgba(0, 255, 153, 0.1), 0 4px 30px -5px rgba(0, 255, 153, 0.08);
+    @apply bg-black/[0.03] border-brand/40;
+    box-shadow: inset 0 0 0 1px rgba(0, 204, 122, 0.1), 0 4px 30px -5px rgba(0, 204, 122, 0.08);
   }
 
   .btn-primary {
@@ -199,7 +199,7 @@
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 border border-white/15 text-foreground px-8 py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:border-brand/40 hover:text-brand;
+    @apply inline-flex items-center justify-center gap-2 border border-black/15 text-foreground px-8 py-4 text-sm font-medium tracking-wide transition-all duration-300 hover:border-brand/40 hover:text-brand;
   }
 
   .label-studio {
@@ -242,12 +242,12 @@
 
   /* Wibify-style border beam / ray-tracing button */
   .beam-button {
-    @apply relative inline-flex rounded-xl p-px overflow-hidden isolate;
+    @apply relative inline-flex rounded-none p-px overflow-hidden isolate;
     text-decoration: none;
   }
 
   .beam-button__track {
-    @apply absolute inset-0 rounded-xl;
+    @apply absolute inset-0 rounded-none;
     background: conic-gradient(
       from var(--beam-angle),
       transparent 0%,
@@ -261,7 +261,7 @@
   }
 
   .beam-button__glow {
-    @apply absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500;
+    @apply absolute inset-0 rounded-none opacity-0 transition-opacity duration-500;
     background: radial-gradient(
       ellipse 80% 60% at 50% 120%,
       var(--brand-glow),
@@ -275,31 +275,31 @@
   }
 
   .beam-button__inner {
-    @apply relative z-10 inline-flex items-center justify-center gap-2.5 rounded-[11px] px-6 py-3.5 md:px-7 md:py-4 text-sm font-medium tracking-wide transition-colors duration-300;
+    @apply relative z-10 inline-flex items-center justify-center gap-2.5 rounded-none px-6 py-3.5 md:px-7 md:py-4 text-sm font-medium tracking-wide transition-colors duration-300;
   }
 
   .beam-button__inner--primary {
-    @apply bg-[#0c0c0c]/95 text-foreground;
+    @apply bg-white/95 text-foreground;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 -24px 48px -20px rgba(0, 255, 153, 0.22);
+      inset 0 1px 0 rgba(0, 0, 0, 0.06),
+      inset 0 -24px 48px -20px rgba(0, 204, 122, 0.22);
   }
 
   .beam-button__inner--primary:hover {
     @apply text-brand;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -28px 56px -18px rgba(0, 255, 153, 0.35);
+      inset 0 1px 0 rgba(0, 0, 0, 0.08),
+      inset 0 -28px 56px -18px rgba(0, 204, 122, 0.35);
   }
 
   .beam-button__inner--secondary {
-    @apply bg-[#0c0c0c]/80 text-muted-foreground border border-white/[0.06];
-    box-shadow: inset 0 -16px 32px -18px rgba(0, 255, 153, 0.08);
+    @apply bg-white/80 text-muted-foreground border border-black/[0.06];
+    box-shadow: inset 0 -16px 32px -18px rgba(0, 204, 122, 0.08);
   }
 
   .beam-button__inner--secondary:hover {
     @apply text-foreground border-brand/25;
-    box-shadow: inset 0 -20px 40px -16px rgba(0, 255, 153, 0.18);
+    box-shadow: inset 0 -20px 40px -16px rgba(0, 204, 122, 0.18);
   }
 }
 

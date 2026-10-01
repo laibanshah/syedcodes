@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimation, useMotionValue } from "framer-motion";
 import {
   Monitor,
   Globe,
@@ -17,7 +17,6 @@ import { Service } from "@/lib/types";
 import { getServices } from "@/lib/db";
 import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
-import { staggerContainer, staggerItem } from "@/lib/motion";
 
 const iconMap: Record<string, React.ReactNode> = {
   Globe: <Globe className="w-5 h-5" strokeWidth={1.5} />,
@@ -35,10 +34,22 @@ const iconMap: Record<string, React.ReactNode> = {
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const controls = useAnimation();
+  const x = useMotionValue(0);
 
   useEffect(() => {
     loadServices();
   }, []);
+
+  useEffect(() => {
+    if (services.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % services.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [services.length]);
 
   const loadServices = async () => {
     try {
@@ -65,35 +76,57 @@ export default function Services() {
           align="center"
         />
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-        >
-          {services.map((service) => (
-            <motion.div
-              key={service.id}
-              variants={staggerItem}
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="premium-card p-8 md:p-10 group"
-            >
-              <div className="w-12 h-12 flex items-center justify-center border border-white/10 rounded-lg mb-8 text-brand group-hover:border-brand/40 transition-colors">
-                {iconMap[service.icon_name] || (
-                  <Globe className="w-5 h-5" strokeWidth={1.5} />
-                )}
-              </div>
-              <h3 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-4">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
-                {service.description}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
+        <div className="relative overflow-hidden py-12">
+          <motion.div
+            className="flex justify-center"
+            animate={{ x: `-${currentIndex * 100}%` }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            style={{ width: `${services.length * 100}%` }}
+          >
+            {services.map((service, index) => (
+              <motion.div
+                key={service.id}
+                className="flex-shrink-0 px-4"
+                style={{ width: `${100 / services.length}%` }}
+              >
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="p-8 md:p-10 group h-full flex flex-col items-center text-center"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-16 h-16 flex items-center justify-center rounded-full mb-8 text-brand"
+                  >
+                    {iconMap[service.icon_name] || (
+                      <Globe className="w-8 h-8" strokeWidth={1.5} />
+                    )}
+                  </motion.div>
+                  <h3 className="text-xl md:text-2xl font-heading font-semibold text-foreground mb-4">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">
+                    {service.description}
+                  </p>
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Carousel indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {services.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex ? "bg-brand w-6" : "bg-white/20"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,19 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
-import Services from "@/components/Services";
 import Projects from "@/components/Projects";
 import LanternOfLight from "@/components/LanternOfLight";
-import WorkPolicy from "@/components/WorkPolicy";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import { getFeaturedProjects, getAboutSection, getSetting } from "@/lib/db";
+import { getFeaturedProjects, getSetting } from "@/lib/db";
 import CinematicIntroClientWrapper from "@/components/CinematicIntroClientWrapper";
-import { ParticleBall } from "@/components/ParticleBall";
 
 export default async function Home() {
   const projects = await getFeaturedProjects();
-  const about = await getAboutSection();
   const heroSettings = await getSetting("hero");
   const socialSettings = await getSetting("social_links");
 
@@ -27,7 +22,6 @@ export default async function Home() {
   return (
     <main className="flex flex-col min-h-screen bg-transparent relative">
       <CinematicIntroClientWrapper />
-      <ParticleBall />
       <Navbar socialLinks={socialLinks} />
       <div className="flex-1 relative z-10">
         <Hero
@@ -35,12 +29,6 @@ export default async function Home() {
           subtitle={heroSettings?.value?.subtitle}
         />
         <Projects projects={projects} />
-        <About
-          title={about?.title || undefined}
-          content={about?.content || undefined}
-        />
-        <Services />
-        <WorkPolicy />
         <LanternOfLight />
         <Contact />
       </div>

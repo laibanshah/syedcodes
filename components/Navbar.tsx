@@ -15,9 +15,6 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { name: "Work", href: "/#projects" },
-  { name: "About", href: "/#about" },
-  { name: "Services", href: "/#services" },
-  { name: "Process", href: "/#process" },
   { name: "Pricing", href: "/pricing", external: true },
   { name: "Resources", href: "/resources", external: true },
   { name: "Contact", href: "/#contact" },
@@ -90,13 +87,13 @@ export default function Navbar({}: NavbarProps) {
           className={clsx(
             "flex items-center justify-between transition-all duration-500",
             isScrolled &&
-              "py-3 px-5 md:px-6 border border-white/[0.08] bg-background/85 backdrop-blur-md"
+              "py-3 px-5 md:px-6 border border-black/[0.08] bg-background/85 backdrop-blur-md"
           )}
         >
           <Link
             href="/#home"
             onClick={(e) => scrollToSection(e, "#home")}
-            className="text-sm md:text-base font-heading font-semibold tracking-tight text-foreground group"
+            className="text-sm md:text-base font-heading font-semibold tracking-tight text-foreground group md:flex-1"
           >
             Syed<span className="text-brand">Codes</span>
             <span className="text-muted-foreground">.UI</span>
@@ -119,15 +116,8 @@ export default function Navbar({}: NavbarProps) {
           </nav>
 
           <div className="flex items-center gap-3">
-            <a
-              href="/#contact"
-              onClick={(e) => scrollToSection(e, "#contact")}
-              className="hidden md:inline-flex btn-primary rounded-full !py-2.5 !px-6 text-xs uppercase tracking-widest"
-            >
-              Hire me
-            </a>
             <button
-              className="md:hidden p-2 border border-white/10 rounded-full text-foreground hover:border-brand/40"
+              className="md:hidden p-2 border border-black/10 rounded-full text-foreground hover:border-brand/40"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -143,7 +133,7 @@ export default function Navbar({}: NavbarProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden overflow-hidden border-t border-white/[0.06] bg-background mt-2"
+            className="md:hidden overflow-hidden border-t border-black/[0.06] bg-background mt-2"
           >
             <div className="container-premium py-6 flex flex-col gap-1">
               <a
@@ -160,7 +150,7 @@ export default function Navbar({}: NavbarProps) {
                   onClick={(e) => scrollToSection(e, link.href, link.external)}
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
-                  className="py-3 text-sm uppercase tracking-widest text-muted-foreground hover:text-brand border-t border-white/[0.06]"
+                  className="py-3 text-sm uppercase tracking-widest text-muted-foreground hover:text-brand border-t border-black/[0.06]"
                 >
                   {link.name}
                 </a>

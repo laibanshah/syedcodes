@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     "Personal portfolio for SyedCodes.UI showcasing luxury web development, React, Next.js, and client-focused solutions.",
 };
 
+import ShootingStars from "@/components/ShootingStars";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,6 +61,15 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 -z-10"
+            style={{
+              backgroundImage: `linear-gradient(90deg, rgba(255,255,255,0.043) 1px, rgba(0,0,0,0) 1px), linear-gradient(rgba(255,255,255,0.043) 1px, rgba(0,0,0,0) 1px)`,
+              backgroundSize: "56px 56px",
+            }}
+          />
+          <ShootingStars />
           <SmoothScroll>
             <CustomCursor />
             {children}

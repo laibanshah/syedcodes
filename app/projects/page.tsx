@@ -11,12 +11,12 @@ export default async function ProjectsPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-28 md:pt-32">
-        <section className="section-padding pb-12 md:pb-16 border-b border-white/[0.06]">
+      <main className="flex-1 pt-24 md:pt-28">
+        <section className="py-16 md:py-20 border-b border-black/[0.06]">
           <div className="container-premium">
             <Link
               href="/#home"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-12"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-8"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to home
@@ -31,7 +31,7 @@ export default async function ProjectsPage() {
           </div>
         </section>
 
-        <section className="section-padding pt-0">
+        <section className="py-16 md:py-20">
           <div className="container-premium">
             {projects.length === 0 ? (
               <div className="text-center py-20 premium-card">
