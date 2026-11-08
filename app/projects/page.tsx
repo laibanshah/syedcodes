@@ -1,16 +1,24 @@
-import { getProjects } from "@/lib/db";
+import type { Metadata } from "next";
+import { getProjects, getBranding } from "@/lib/data";
 import Image from "next/image";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+export const revalidate = 300;
+
+export const metadata: Metadata = {
+  title: "All projects | SyedCodes.UI",
+  description: "A complete collection of digital experiences crafted with precision and care.",
+};
+
 export default async function ProjectsPage() {
-  const projects = await getProjects();
+  const [projects, branding] = await Promise.all([getProjects(), getBranding()]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
+      <Navbar logoUrl={branding.logo_url} />
       <main className="flex-1 pt-24 md:pt-28">
         <section className="py-16 md:py-20 border-b border-black/[0.06]">
           <div className="container-premium">
@@ -63,13 +71,13 @@ export default async function ProjectsPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-muted min-h-[240px]">
-                          <span className="text-6xl font-heading font-semibold text-white/10">
+                          <span className="text-6xl font-heading font-semibold text-black/10">
                             {project.title[0]}
                           </span>
                         </div>
                       )}
                       {project.featured && (
-                        <span className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 border border-white/20 bg-black/50 text-foreground">
+                        <span className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 border border-black/10 bg-white/80 text-foreground">
                           Featured
                         </span>
                       )}
@@ -93,7 +101,7 @@ export default async function ProjectsPage() {
                         {project.tech_stack.map((tech) => (
                           <span
                             key={tech}
-                            className="px-3 py-1.5 text-xs uppercase tracking-wider text-muted-foreground border border-white/10 rounded-full"
+                            className="px-3 py-1.5 text-xs uppercase tracking-wider text-muted-foreground border border-black/10 rounded-full"
                           >
                             {tech}
                           </span>
@@ -116,7 +124,7 @@ export default async function ProjectsPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer logoUrl={branding.logo_url} />
     </div>
   );
 }

@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { fadeUp } from "@/lib/motion";
 import HeroAccentWord from "@/components/HeroAccentWord";
-import BeamButton from "@/components/BeamButton";
+import { DEFAULT_OWNER_IMAGE } from "@/lib/content-defaults";
 
 interface HeroProps {
   title?: string;
   subtitle?: string;
   video?: string;
+  /** Owner photo from Admin > Branding. Empty = the built-in /assets/owner.jpg. */
+  ownerImage?: string;
 }
 
 function DefaultHeroHeadline() {
@@ -27,7 +29,7 @@ function DefaultHeroHeadline() {
   );
 }
 
-export default function Hero({ title, subtitle, video }: HeroProps) {
+export default function Hero({ title, subtitle, video, ownerImage }: HeroProps) {
   const displaySubtitle = subtitle || title;
 
   return (
@@ -82,7 +84,7 @@ export default function Hero({ title, subtitle, video }: HeroProps) {
               className="mt-8 md:mt-10 text-muted-foreground text-base md:text-lg max-w-lg leading-relaxed"
             >
               {displaySubtitle ||
-                "Websites, branding, software and mobile apps — digital products for brands with ambition."}
+                "Websites, branding, software and mobile apps , digital products for brands with ambition."}
             </motion.p>
           </div>
 
@@ -114,9 +116,10 @@ export default function Hero({ title, subtitle, video }: HeroProps) {
                 }}
               >
                 <Image
-                  src="/assets/owner.jpg"
+                  src={ownerImage || DEFAULT_OWNER_IMAGE}
                   alt="SyedCodes.UI"
                   fill
+                  sizes="(max-width: 640px) 256px, (max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
                   className="object-cover object-center"
                   priority
                 />

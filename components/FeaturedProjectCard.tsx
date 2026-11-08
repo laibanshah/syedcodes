@@ -55,7 +55,7 @@ export default function FeaturedProjectCard({
             perspective={1200}
             className="transform-gpu"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-card aspect-[16/10] lg:aspect-[16/11] group-hover:border-brand/30 transition-colors duration-500 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)]">
+            <div className="relative overflow-hidden rounded-2xl border border-black/[0.08] bg-card aspect-[16/10] lg:aspect-[16/11] group-hover:border-brand/30 transition-colors duration-500 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.25)]">
               {project.image_url ? (
                 <Image
                   src={project.image_url}
@@ -77,7 +77,7 @@ export default function FeaturedProjectCard({
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="w-8 h-px bg-brand/50" />
-                <span className="text-[10px] uppercase tracking-[0.25em] text-white/60">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-white/70">
                   Featured
                 </span>
               </div>
@@ -114,7 +114,7 @@ export default function FeaturedProjectCard({
             {project.tech_stack.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground border border-white/10 rounded-full hover:border-brand/40 hover:text-brand transition-colors"
+                className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground border border-black/10 rounded-full hover:border-brand/40 hover:text-brand transition-colors"
               >
                 {tech}
               </span>

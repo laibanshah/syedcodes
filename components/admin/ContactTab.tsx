@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, X, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { ContactLink } from "@/lib/types";
-import { getContactLinks, createContactLink, updateContactLink, deleteContactLink } from "@/lib/db";
+import { getContactLinks, createContactLink, updateContactLink, deleteContactLink } from "@/lib/admin-data";
 import { toast } from "sonner";
+import { useConfirm, useConfirmDiscard, useUnsavedGuard, isDirty } from "./guard";
 
 const iconOptions = [
   { name: "FaLinkedin", label: "LinkedIn" },
@@ -18,18 +19,21 @@ const iconOptions = [
   { name: "FaFacebook", label: "Facebook" },
 ];
 
+const emptyForm = { platform: "", url: "", icon_name: "FaLinkedin", order_index: 0 };
+
 export default function ContactTab() {
   const [contactLinks, setContactLinks] = useState<ContactLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingLink, setEditingLink] = useState<ContactLink | null>(null);
 
-  const [formData, setFormData] = useState({
-    platform: "",
-    url: "",
-    icon_name: "FaLinkedin",
-    order_index: 0,
-  });
+  const [formData, setFormData] = useState(emptyForm);
+  const [baseline, setBaseline] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const confirm = useConfirm();
+  const confirmDiscard = useConfirmDiscard();
+
+  useUnsavedGuard(showForm && isDirty(formData, baseline));
 
   useEffect(() => {
     loadContactLinks();
@@ -49,7 +53,8 @@ export default function ContactTab() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setSaving(true);
+
     try {
       if (editingLink) {
         await updateContactLink(editingLink.id, formData);
@@ -65,24 +70,42 @@ export default function ContactTab() {
       resetForm();
       loadContactLinks();
     } catch (error) {
-      toast.error("Failed to save contact link");
+      toast.error(`Failed to save contact link${error instanceof Error ? `: ${error.message}` : ""}`);
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleEdit = (link: ContactLink) => {
+  const openForm = async (link: ContactLink | null) => {
+    if (showForm && !(await confirmDiscard())) return;
+    const next = link
+      ? {
+          platform: link.platform,
+          url: link.url,
+          icon_name: link.icon_name,
+          order_index: link.order_index,
+        }
+      : emptyForm;
     setEditingLink(link);
-    setFormData({
-      platform: link.platform,
-      url: link.url,
-      icon_name: link.icon_name,
-      order_index: link.order_index,
-    });
+    setFormData(next);
+    setBaseline(next);
     setShowForm(true);
   };
 
+  const closeForm = async () => {
+    if (!(await confirmDiscard())) return;
+    resetForm();
+  };
+
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this contact link?")) return;
+    const ok = await confirm({
+      title: "Delete this contact link?",
+      message: "It will be removed from the website. This can't be undone.",
+      confirmLabel: "Delete link",
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       await deleteContactLink(id);
@@ -95,7 +118,8 @@ export default function ContactTab() {
   };
 
   const resetForm = () => {
-    setFormData({ platform: "", url: "", icon_name: "FaLinkedin", order_index: 0 });
+    setFormData(emptyForm);
+    setBaseline(emptyForm);
     setEditingLink(null);
     setShowForm(false);
   };
@@ -110,13 +134,13 @@ export default function ContactTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Contact Links</h2>
           <p className="text-muted-foreground">Manage your social media and contact links</p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => openForm(null)}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -128,14 +152,14 @@ export default function ContactTab() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="bg-card border border-border rounded-2xl p-4 sm:p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold">
               {editingLink ? "Edit Contact Link" : "New Contact Link"}
             </h3>
             <button
-              onClick={resetForm}
+              onClick={closeForm}
               className="p-2 hover:bg-secondary rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
@@ -188,16 +212,17 @@ export default function ContactTab() {
               </select>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 type="submit"
-                className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                disabled={saving}
+                className="flex-1 disabled:opacity-50 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
               >
                 {editingLink ? "Update Link" : "Create Link"}
               </button>
               <button
                 type="button"
-                onClick={resetForm}
+                onClick={closeForm}
                 className="px-6 py-3 rounded-xl border border-border hover:bg-secondary transition-colors"
               >
                 Cancel
@@ -218,13 +243,10 @@ export default function ContactTab() {
               key={link.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors"
+              className="bg-card border border-border rounded-2xl p-4 sm:p-6 hover:border-primary/30 transition-colors"
             >
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-secondary rounded-xl">
-                  <GripVertical className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0 break-words">
                   <h3 className="text-xl font-semibold text-foreground mb-2">{link.platform}</h3>
                   <a
                     href={link.url}
@@ -240,7 +262,7 @@ export default function ContactTab() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleEdit(link)}
+                    onClick={() => openForm(link)}
                     className="p-2 hover:bg-secondary rounded-lg transition-colors"
                     title="Edit"
                   >

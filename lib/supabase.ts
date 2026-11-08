@@ -1,31 +1,39 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+/**
+ * One Supabase client, authenticated with the PUBLISHABLE key (sb_publishable_...).
+ *
+ * - Visitors (and the server while rendering public pages) only ever read data,
+ *   which Row Level Security allows for everyone.
+ * - The admin panel signs in with email + password in the browser; that session
+ *   is what authorises every write (RLS policy "to authenticated").
+ *
+ * There is no secret / service-role key anywhere in this project any more.
+ *
+ * NEXT_PUBLIC_* values must be referenced statically (process.env.NAME) so that
+ * Next.js can inline them into the browser bundle.
+ */
+export const SUPABASE_URL_ENV = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const publishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  // Legacy name, read only so an old Netlify/.env.local setup keeps working until you rename it.
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "";
 
-const isMissingEnv = !supabaseUrl || !supabaseAnonKey;
+export const isSupabaseConfigured = Boolean(SUPABASE_URL_ENV && publishableKey);
 
-if (isMissingEnv) {
+if (!isSupabaseConfigured && typeof window === "undefined") {
   console.warn(
-    '⚠️ Warning: Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing. ' +
-    'The app will fall back to static preview data during build-time to prevent build failures. ' +
-    'Please set these environment variables in your local .env.local file or in Netlify for full database functionality.'
+    "[supabase] NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are not set. " +
+      "Public pages will render built-in fallback content until you set them (.env.local locally, " +
+      "Site configuration > Environment variables on Netlify)."
   );
 }
 
-// Fallback mock values to prevent createClient from throwing on empty/invalid arguments during build
-const urlToUse = supabaseUrl || 'https://placeholder-project.supabase.co';
-const anonKeyToUse = supabaseAnonKey || 'placeholder-anon-key';
+// Placeholders keep createClient from throwing at build time when the variables are missing.
+export const SUPABASE_URL = SUPABASE_URL_ENV || "https://placeholder-project.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = publishableKey || "placeholder-publishable-key";
 
-// Public client for frontend operations
-export const supabase = createClient(urlToUse, anonKeyToUse);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-// Admin client with service role key for bypassing RLS
-// On the client-side, we fall back to the public client to prevent initialization errors
-export const supabaseAdmin = supabaseServiceKey
-  ? createClient(urlToUse, supabaseServiceKey)
-  : supabase;
-
-// Types for our database tables
-export type { Project, Service, AboutSection, ContactLink, Setting } from './types';
+export type { Project, Service, AboutSection, ContactLink, Setting } from "./types";

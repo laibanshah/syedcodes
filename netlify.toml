@@ -3,7 +3,24 @@
   publish = ".next"
 
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  # Next.js 16 needs Node 20.9+; pin it so Netlify never picks an older default.
+  NODE_VERSION = "22"
+  # Publishable keys and the project URL are public by design (they ship in the browser bundle),
+  # so don't let Netlify's secret scanner fail the build on them.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SITE_URL"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Static images in /public: cache for a day, then revalidate in the background.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"

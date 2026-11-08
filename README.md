@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SyedCodes.UI portfolio
 
-## Getting Started
+Next.js 16 (App Router) · Tailwind CSS 4 · Supabase · deployed on Netlify.
 
-First, run the development server:
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp env.example .env.local     # then fill in the two Supabase values
+npm install
+npm run dev                   # http://localhost:3000   (admin: /admin)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Checks: `npm run typecheck`, `npm run lint`, `npm run build`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables (local `.env.local` and Netlify → Site configuration → Environment variables)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Name | Value |
+|------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://YOUR-PROJECT.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` (Supabase → Project Settings → API Keys) |
+| `NEXT_PUBLIC_SITE_URL` | optional; Netlify’s own `URL` is used if unset |
 
-## Learn More
+No secret / service-role key is used. Admin edits run with the admin’s own login and are authorised by
+Row Level Security.
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See [`supabase/README.md`](supabase/README.md) — SQL lives in `supabase/migrations/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The site is light-only (`color-scheme: only light`), so browser/OS dark modes can’t darken it.
+- Public pages are static and refresh within 5 minutes, or instantly when you save in `/admin`.
+- Big uploads (> 6 MB) use a built-in resumable uploader (TUS) with a progress bar.

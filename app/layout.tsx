@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
-import Script from "next/script";
 import CustomCursor from "@/components/ui/CustomCursor";
+import ShootingStars from "@/components/ShootingStars";
+import { getBranding } from "@/lib/data";
+import { DEFAULT_FAVICON } from "@/lib/content-defaults";
+import { getSiteUrl } from "@/lib/site";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,13 +23,53 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "SyedCodes.UI | Premium Web Development Portfolio",
-  description:
-    "Personal portfolio for SyedCodes.UI showcasing luxury web development, React, Next.js, and client-focused solutions.",
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
 };
 
-import ShootingStars from "@/components/ShootingStars";
+const ICON_TYPES: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  gif: "image/gif",
+  svg: "image/svg+xml",
+  ico: "image/x-icon",
+};
+
+function iconType(url: string): string | undefined {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+  return ICON_TYPES[ext];
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const branding = await getBranding();
+  const favicon = branding.favicon_url || DEFAULT_FAVICON;
+  const title = "SyedCodes.UI | Premium Web Development Portfolio";
+  const description =
+    "Personal portfolio for SyedCodes.UI showcasing luxury web development, React, Next.js, and client-focused solutions.";
+
+  return {
+    metadataBase: new URL(getSiteUrl()),
+    title,
+    description,
+    icons: {
+      icon: [{ url: favicon, type: iconType(favicon) }],
+      shortcut: favicon,
+      apple: favicon,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      siteName: "SyedCodes.UI",
+    },
+    // Tells browsers (incl. Chrome's auto dark mode) that this site is light-only.
+    other: { "color-scheme": "only light" },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -37,45 +79,25 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={`${inter.variable} ${instrumentSerif.variable} light`}
+      className={`${inter.variable} ${instrumentSerif.variable}`}
+      style={{ colorScheme: "light" }}
     >
       <head>
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
         <link
           href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
-        <Script
-          src="https://identity.netlify.com/v1/netlify-identity-widget.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="/netlify-identity-init.js"
-          strategy="afterInteractive"
-        />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none fixed inset-0 -z-10"
-            style={{
-              backgroundImage: `linear-gradient(90deg, rgba(255,255,255,0.043) 1px, rgba(0,0,0,0) 1px), linear-gradient(rgba(255,255,255,0.043) 1px, rgba(0,0,0,0) 1px)`,
-              backgroundSize: "56px 56px",
-            }}
-          />
-          <ShootingStars />
-          <SmoothScroll>
-            <CustomCursor />
-            {children}
-            <Toaster position="bottom-right" theme="light" />
-          </SmoothScroll>
-        </ThemeProvider>
+        <div aria-hidden="true" className="site-grid pointer-events-none fixed inset-0 -z-10" />
+        <ShootingStars />
+        <SmoothScroll>
+          <CustomCursor />
+          {children}
+          <Toaster position="bottom-right" theme="light" />
+        </SmoothScroll>
       </body>
     </html>
   );

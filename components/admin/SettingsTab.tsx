@@ -2,28 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Save, X } from "lucide-react";
-import { Setting } from "@/lib/types";
-import { getSetting, updateSetting } from "@/lib/db";
+import { Save } from "lucide-react";
+import { getSetting, updateSetting } from "@/lib/admin-data";
 import { toast } from "sonner";
+import { useUnsavedGuard, isDirty } from "./guard";
 
 export default function SettingsTab() {
-  const [heroSettings, setHeroSettings] = useState<any>(null);
-  const [socialSettings, setSocialSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [heroForm, setHeroForm] = useState({
-    title: "",
-    subtitle: "",
-  });
+  const [heroForm, setHeroForm] = useState({ title: "", subtitle: "" });
+  const [heroBase, setHeroBase] = useState({ title: "", subtitle: "" });
+  const [socialForm, setSocialForm] = useState({ linkedin: "", github: "", instagram: "", youtube: "" });
+  const [socialBase, setSocialBase] = useState({ linkedin: "", github: "", instagram: "", youtube: "" });
 
-  const [socialForm, setSocialForm] = useState({
-    linkedin: "",
-    github: "",
-    instagram: "",
-    youtube: "",
-  });
+  useUnsavedGuard(isDirty(heroForm, heroBase) || isDirty(socialForm, socialBase));
 
   useEffect(() => {
     loadSettings();
@@ -31,27 +24,21 @@ export default function SettingsTab() {
 
   const loadSettings = async () => {
     try {
-      const heroData = await getSetting("hero");
-      const socialData = await getSetting("social_links");
-      
-      setHeroSettings(heroData);
-      setSocialSettings(socialData);
+      const heroData = await getSetting<{ title?: string; subtitle?: string }>("hero");
+      const socialData = await getSetting<Record<string, string>>("social_links");
 
-      if (heroData?.value) {
-        setHeroForm({
-          title: heroData.value.title || "",
-          subtitle: heroData.value.subtitle || "",
-        });
-      }
+      const hero = { title: heroData?.title || "", subtitle: heroData?.subtitle || "" };
+      setHeroForm(hero);
+      setHeroBase(hero);
 
-      if (socialData?.value) {
-        setSocialForm({
-          linkedin: socialData.value.linkedin || "",
-          github: socialData.value.github || "",
-          instagram: socialData.value.instagram || "",
-          youtube: socialData.value.youtube || "",
-        });
-      }
+      const social = {
+        linkedin: socialData?.linkedin || "",
+        github: socialData?.github || "",
+        instagram: socialData?.instagram || "",
+        youtube: socialData?.youtube || "",
+      };
+      setSocialForm(social);
+      setSocialBase(social);
     } catch (error) {
       toast.error("Failed to load settings");
       console.error(error);
@@ -111,7 +98,7 @@ export default function SettingsTab() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="bg-card border border-border rounded-2xl p-4 sm:p-6"
       >
         <h3 className="text-lg font-semibold mb-6">Hero Section</h3>
         <form onSubmit={handleHeroSubmit} className="space-y-6">
@@ -159,7 +146,7 @@ export default function SettingsTab() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="bg-card border border-border rounded-2xl p-4 sm:p-6"
       >
         <h3 className="text-lg font-semibold mb-6">Social Links</h3>
         <form onSubmit={handleSocialSubmit} className="space-y-6">

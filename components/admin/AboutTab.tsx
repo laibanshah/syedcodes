@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Save, X } from "lucide-react";
+import { Save } from "lucide-react";
 import { AboutSection } from "@/lib/types";
-import { getAboutSection, updateAboutSection } from "@/lib/db";
+import { getAboutSection, updateAboutSection } from "@/lib/admin-data";
 import { toast } from "sonner";
+import { useUnsavedGuard, isDirty } from "./guard";
 
 export default function AboutTab() {
   const [about, setAbout] = useState<AboutSection | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-  });
+  const [formData, setFormData] = useState({ title: "", content: "" });
+  const [baseline, setBaseline] = useState({ title: "", content: "" });
+
+  useUnsavedGuard(isDirty(formData, baseline));
 
   useEffect(() => {
     loadAbout();
@@ -26,10 +27,9 @@ export default function AboutTab() {
       const data = await getAboutSection();
       setAbout(data);
       if (data) {
-        setFormData({
-          title: data.title || "",
-          content: data.content || "",
-        });
+        const loaded = { title: data.title || "", content: data.content || "" };
+        setFormData(loaded);
+        setBaseline(loaded);
       }
     } catch (error) {
       toast.error("Failed to load about section");
@@ -73,7 +73,7 @@ export default function AboutTab() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border border-border rounded-2xl p-6"
+        className="bg-card border border-border rounded-2xl p-4 sm:p-6"
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -121,7 +121,7 @@ export default function AboutTab() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="bg-card border border-border rounded-2xl p-4 sm:p-6"
         >
           <h3 className="text-lg font-semibold mb-4">Preview</h3>
           <div className="space-y-4">

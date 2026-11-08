@@ -31,7 +31,7 @@ export default function Projects({ projects }: ProjectsProps) {
           <SectionHeader
             label="Selected work"
             title="Featured projects"
-            description="Digital products built with studio-level craft — performance, clarity, and conversion in every pixel."
+            description="Digital products built with studio-level craft , performance, clarity, and conversion in every pixel."
             className="mb-0"
           />
           <Link

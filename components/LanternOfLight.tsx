@@ -9,6 +9,8 @@ interface LanternContent {
   subtitle: string;
   description: string;
   image: string;
+  button_label?: string;
+  button_url?: string;
 }
 
 interface LanternOfLightProps {
@@ -22,10 +24,12 @@ export default function LanternOfLight({ content }: LanternOfLightProps = {}) {
     description:
       "A spiritual and Islamic community presentation focused on guiding hearts, sharing wisdom, and fostering a supportive environment built on faith and unity.",
     image: "/assets/lol.png",
+    button_label: "Join WhatsApp community",
+    button_url: "https://whatsapp.com/channel/0029VaeYmbP5PO0zmfC6Yl2J",
   };
 
   return (
-    <section className="section-padding relative border-t border-white/[0.06] overflow-hidden">
+    <section className="section-padding relative border-t border-black/[0.06] overflow-hidden">
       <div className="container-premium">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-24 items-center">
           <motion.div
@@ -36,12 +40,13 @@ export default function LanternOfLight({ content }: LanternOfLightProps = {}) {
             custom={0}
             className="flex justify-center md:justify-start"
           >
-            <div className="relative w-56 h-56 md:w-72 md:h-72 border border-white/[0.08] bg-card p-8">
+            <div className="relative w-56 h-56 md:w-72 md:h-72 border border-black/[0.08] bg-card p-8">
               <Image
                 src={data.image}
                 alt={data.title}
                 fill
                 className="object-contain p-6"
+                sizes="(max-width: 768px) 224px, 288px"
               />
             </div>
           </motion.div>
@@ -64,12 +69,12 @@ export default function LanternOfLight({ content }: LanternOfLightProps = {}) {
               {data.description}
             </p>
             <a
-              href="https://whatsapp.com/channel/0029VaeYmbP5PO0zmfC6Yl2J"
+              href={data.button_url || "https://whatsapp.com/channel/0029VaeYmbP5PO0zmfC6Yl2J"}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline rounded-none inline-flex"
             >
-              Join WhatsApp community
+              {data.button_label || "Join WhatsApp community"}
             </a>
           </motion.div>
         </div>

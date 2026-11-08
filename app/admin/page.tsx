@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, FolderOpen, Briefcase, User, Link, Settings as SettingsIcon, LogOut, Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react";
+import { LayoutDashboard, Palette, FolderOpen, Briefcase, User, Link, Settings as SettingsIcon, LogOut, Lock, Mail, Eye, EyeOff, Loader2, Tag, ShieldCheck, FileText, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import ProjectsTab from "@/components/admin/ProjectsTab";
 import ServicesTab from "@/components/admin/ServicesTab";
@@ -10,14 +10,19 @@ import AboutTab from "@/components/admin/AboutTab";
 import ContactTab from "@/components/admin/ContactTab";
 import SettingsTab from "@/components/admin/SettingsTab";
 import ResourcesTab from "@/components/admin/ResourcesTab";
+import PricingTab from "@/components/admin/PricingTab";
+import PolicyTab from "@/components/admin/PolicyTab";
+import PageContentTab from "@/components/admin/PageContentTab";
+import BrandingTab from "@/components/admin/BrandingTab";
+import { AdminGuardProvider, useConfirmDiscard } from "@/components/admin/guard";
+import type { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
-type TabType = "projects" | "services" | "about" | "contact" | "settings" | "resources";
+type TabType = "projects" | "services" | "pricing" | "policy" | "pagecontent" | "branding" | "about" | "contact" | "settings" | "resources";
 
 export default function AdminPage() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("projects");
 
   // Login form state
   const [email, setEmail] = useState("");
@@ -56,7 +61,7 @@ export default function AdminPage() {
         toast.success("Successfully authorized!");
         setSession(data.session);
       }
-    } catch (err: any) {
+    } catch (err) {
       toast.error("An unexpected error occurred during login.");
       console.error(err);
     } finally {
@@ -78,18 +83,9 @@ export default function AdminPage() {
     }
   };
 
-  const tabs = [
-    { id: "projects" as TabType, label: "Projects", icon: <FolderOpen className="w-5 h-5" /> },
-    { id: "services" as TabType, label: "Services", icon: <Briefcase className="w-5 h-5" /> },
-    { id: "about" as TabType, label: "About", icon: <User className="w-5 h-5" /> },
-    { id: "contact" as TabType, label: "Contact", icon: <Link className="w-5 h-5" /> },
-    { id: "resources" as TabType, label: "Resources", icon: <FolderOpen className="w-5 h-5" /> },
-    { id: "settings" as TabType, label: "Settings", icon: <SettingsIcon className="w-5 h-5" /> },
-  ];
-
   if (loadingSession) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="admin-root min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
           <p className="text-muted-foreground text-sm font-medium">Securing admin gateway...</p>
@@ -101,7 +97,7 @@ export default function AdminPage() {
   // If not authenticated, show a stunning premium glassmorphism Login Form
   if (!session) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden px-4">
+      <div className="admin-root min-h-screen bg-background flex items-center justify-center relative overflow-hidden px-4">
         {/* Cinematic Backdrop Glows */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
@@ -186,51 +182,110 @@ export default function AdminPage() {
     );
   }
 
-  // Render original Admin Panel for Authenticated Users
+  return (
+    <div className="admin-root">
+      <AdminGuardProvider>
+        <AdminShell session={session} onLogout={handleLogout} />
+      </AdminGuardProvider>
+    </div>
+  );
+}
+
+function AdminShell({ session, onLogout }: { session: Session; onLogout: () => void }) {
+  const [activeTab, setActiveTab] = useState<TabType>("projects");
+  const confirmDiscard = useConfirmDiscard();
+
+  // Switching sections with unsaved edits asks first.
+  const switchTab = async (id: TabType) => {
+    if (id === activeTab) return;
+    if (!(await confirmDiscard())) return;
+    setActiveTab(id);
+  };
+
+  const tabs = [
+    { id: "projects" as TabType, label: "Projects", icon: <FolderOpen className="w-5 h-5" /> },
+    { id: "services" as TabType, label: "Services", icon: <Briefcase className="w-5 h-5" /> },
+    { id: "pricing" as TabType, label: "Pricing", icon: <Tag className="w-5 h-5" /> },
+    { id: "policy" as TabType, label: "Policy", icon: <ShieldCheck className="w-5 h-5" /> },
+    { id: "pagecontent" as TabType, label: "Page Content", icon: <FileText className="w-5 h-5" /> },
+    { id: "branding" as TabType, label: "Branding", icon: <Palette className="w-5 h-5" /> },
+    { id: "about" as TabType, label: "About", icon: <User className="w-5 h-5" /> },
+    { id: "contact" as TabType, label: "Contact", icon: <Link className="w-5 h-5" /> },
+    { id: "resources" as TabType, label: "Resources", icon: <FolderOpen className="w-5 h-5" /> },
+    { id: "settings" as TabType, label: "Settings", icon: <SettingsIcon className="w-5 h-5" /> },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <LayoutDashboard className="w-6 h-6 text-primary" />
+      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 md:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                <LayoutDashboard className="w-5 h-5 text-primary" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Admin Panel</h1>
-                <p className="text-sm text-muted-foreground">Logged in as {session.user?.email}</p>
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl font-bold text-foreground leading-tight">Admin Panel</h1>
+                <p className="text-xs md:text-sm text-muted-foreground truncate">{session.user.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 shrink-0">
               <a
                 href="/"
-                className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View live site"
+                className="inline-flex items-center gap-2 min-h-10 px-3 md:px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
-                View Live Site
+                <ExternalLink className="w-4 h-4" />
+                <span className="hidden sm:inline">View Live Site</span>
               </a>
               <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                onClick={async () => { if (await confirmDiscard()) onLogout(); }}
+                aria-label="Sign out"
+                className="inline-flex items-center gap-2 min-h-10 px-3 md:px-4 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile / tablet tab bar */}
+        <nav className="lg:hidden border-t border-border" aria-label="Admin sections">
+          <ul className="flex gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {tabs.map((tab) => (
+              <li key={tab.id} className="shrink-0">
+                <button
+                  onClick={() => switchTab(tab.id)}
+                  aria-current={activeTab === tab.id ? "page" : undefined}
+                  className={`inline-flex items-center gap-2 min-h-10 px-4 rounded-full text-sm whitespace-nowrap transition-colors ${
+                    activeTab === tab.id
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
         <div className="flex gap-8">
-          {/* Sidebar */}
-          <aside className="w-64 flex-shrink-0">
-            <nav className="bg-card border border-border rounded-2xl p-4 sticky top-24">
+          {/* Desktop sidebar */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <nav className="bg-card border border-border rounded-2xl p-4 sticky top-28" aria-label="Admin sections">
               <ul className="space-y-2">
                 {tabs.map((tab) => (
                   <li key={tab.id}>
                     <button
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => switchTab(tab.id)}
+                      aria-current={activeTab === tab.id ? "page" : undefined}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                         activeTab === tab.id
                           ? "bg-primary text-primary-foreground font-medium"
@@ -246,20 +301,23 @@ export default function AdminPage() {
             </nav>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
             >
               {activeTab === "projects" && <ProjectsTab />}
               {activeTab === "services" && <ServicesTab />}
+              {activeTab === "pricing" && <PricingTab />}
+              {activeTab === "policy" && <PolicyTab />}
+              {activeTab === "pagecontent" && <PageContentTab />}
+              {activeTab === "branding" && <BrandingTab />}
               {activeTab === "about" && <AboutTab />}
-              { activeTab === "contact" && <ContactTab /> }
-              { activeTab === "resources" && <ResourcesTab /> }
-              { activeTab === "settings" && <SettingsTab /> }
+              {activeTab === "contact" && <ContactTab />}
+              {activeTab === "resources" && <ResourcesTab />}
+              {activeTab === "settings" && <SettingsTab />}
             </motion.div>
           </main>
         </div>

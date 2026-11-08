@@ -1,94 +1,100 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Download } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { supabase, SUPABASE_URL } from "@/lib/supabase";
+import { getBranding } from "@/lib/data";
 
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Served statically and refreshed in the background (and instantly when the admin saves).
+export const revalidate = 300;
 
-export const revalidate = 0; // Fetch fresh data on each request
+export const metadata: Metadata = {
+  title: "Resources | SyedCodes.UI",
+  description: "Free links and downloads shared by SyedCodes.UI.",
+};
+
+interface Resource {
+  id: string;
+  title: string;
+  description: string | null;
+  resource_type: "link" | "file";
+  url: string | null;
+  file_path: string | null;
+}
 
 export default async function ResourcesPage() {
-  const { data: resources, error } = await supabase
-    .from("resources")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data, error }, branding] = await Promise.all([
+    supabase.from("resources").select("*").order("created_at", { ascending: false }),
+    getBranding(),
+  ]);
+  const resources = (data ?? []) as Resource[];
 
   return (
-    <div className="min-h-screen bg-black text-white p-8 md:p-24 relative overflow-hidden flex flex-col items-center">
-      {/* Background styling for glass effect */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black z-0"></div>
-      
-      <div className="relative z-10 w-full max-w-5xl">
-        {/* Navigation */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-16 gap-4">
-          <Link href="/" className="group flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium tracking-wide">Check main site</span>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar logoUrl={branding.logo_url} />
+      <main className="flex-1 pt-28 md:pt-32 pb-20">
+        <div className="container-premium">
+          <Link
+            href="/#home"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to home
           </Link>
-          
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase text-center">Resources</h1>
+          <p className="label-studio mb-6">Free stuff</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-heading font-semibold text-foreground leading-tight">
+            <span className="text-brand">Resources</span>
+          </h1>
 
-          <Link href="/#projects" className="group flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-            <span className="text-sm font-medium tracking-wide">Check my other projects</span>
-            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-          </Link>
-        </div>
-
-        {/* Error State */}
-        {error && (
-          <div className="text-red-400 text-center py-10 bg-red-950/20 border border-red-500/20 rounded-xl backdrop-blur-md">
-            Failed to load resources.
-          </div>
-        )}
-
-        {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {resources?.map((resource) => (
-            <div 
-              key={resource.id}
-              className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_32px_rgba(0,0,0,0.37)] hover:shadow-[0_8px_32px_rgba(255,255,255,0.05)]"
-            >
-              {/* Sharp glass accent */}
-              <div className="absolute inset-0 rounded-2xl border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-              
-              <h3 className="text-xl font-bold mb-2 tracking-tight">{resource.title}</h3>
-              <p className="text-neutral-400 text-sm mb-6 line-clamp-3">
-                {resource.description}
-              </p>
-              
-              <div className="flex justify-end mt-auto">
-                {resource.resource_type === 'link' && resource.url ? (
-                  <a 
-                    href={resource.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm font-medium bg-white text-black px-5 py-2 rounded-full hover:scale-105 transition-transform"
-                  >
-                    Visit Link <ExternalLink className="w-4 h-4" />
-                  </a>
-                ) : resource.resource_type === 'file' && resource.file_path ? (
-                  <a 
-                    href={`${supabaseUrl}/storage/v1/object/public/resources/${resource.file_path}`} 
-                    download
-                    target="_blank"
-                    className="flex items-center gap-2 text-sm font-medium bg-[#00ff99] text-black px-5 py-2 rounded-full hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,255,153,0.3)]"
-                  >
-                    Download <Download className="w-4 h-4" />
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          ))}
-
-          {resources?.length === 0 && !error && (
-            <div className="col-span-full text-center py-20 text-neutral-500">
-              No resources available yet. Check back later!
+          {error && (
+            <div className="mt-12 text-center py-10 premium-card text-muted-foreground">
+              Failed to load resources. Please try again later.
             </div>
           )}
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {resources.map((resource) => (
+              <div key={resource.id} className="premium-card p-6 md:p-8 flex flex-col">
+                <h2 className="text-xl font-heading font-semibold mb-2 tracking-tight break-words">
+                  {resource.title}
+                </h2>
+                <p className="text-muted-foreground text-sm mb-6 line-clamp-3">{resource.description}</p>
+
+                <div className="flex justify-end mt-auto">
+                  {resource.resource_type === "link" && resource.url ? (
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline rounded-full px-5 py-2.5"
+                    >
+                      Visit link <ExternalLink className="w-4 h-4" />
+                    </a>
+                  ) : resource.resource_type === "file" && resource.file_path ? (
+                    <a
+                      href={`${SUPABASE_URL}/storage/v1/object/public/resources/${resource.file_path}`}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary rounded-full px-5 py-2.5"
+                    >
+                      Download <Download className="w-4 h-4" />
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+
+            {resources.length === 0 && !error && (
+              <div className="col-span-full text-center py-20 text-muted-foreground">
+                No resources available yet. Check back later!
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
+      <Footer logoUrl={branding.logo_url} />
     </div>
   );
 }

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, X, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { Service } from "@/lib/types";
-import { getServices, createService, updateService, deleteService } from "@/lib/db";
+import { getServices, createService, updateService, deleteService } from "@/lib/admin-data";
 import { toast } from "sonner";
+import { useConfirm, useConfirmDiscard, useUnsavedGuard, isDirty } from "./guard";
 
 const iconOptions = [
   { name: "Globe", label: "Globe" },
@@ -20,18 +21,21 @@ const iconOptions = [
   { name: "Layout", label: "Layout" },
 ];
 
+const emptyForm = { title: "", description: "", icon_name: "Globe", order_index: 0 };
+
 export default function ServicesTab() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    icon_name: "Globe",
-    order_index: 0,
-  });
+  const [formData, setFormData] = useState(emptyForm);
+  const [baseline, setBaseline] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const confirm = useConfirm();
+  const confirmDiscard = useConfirmDiscard();
+
+  useUnsavedGuard(showForm && isDirty(formData, baseline));
 
   useEffect(() => {
     loadServices();
@@ -51,7 +55,8 @@ export default function ServicesTab() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setSaving(true);
+
     try {
       if (editingService) {
         await updateService(editingService.id, formData);
@@ -67,24 +72,42 @@ export default function ServicesTab() {
       resetForm();
       loadServices();
     } catch (error) {
-      toast.error("Failed to save service");
+      toast.error(`Failed to save service${error instanceof Error ? `: ${error.message}` : ""}`);
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleEdit = (service: Service) => {
+  const openForm = async (service: Service | null) => {
+    if (showForm && !(await confirmDiscard())) return;
+    const next = service
+      ? {
+          title: service.title,
+          description: service.description,
+          icon_name: service.icon_name,
+          order_index: service.order_index,
+        }
+      : emptyForm;
     setEditingService(service);
-    setFormData({
-      title: service.title,
-      description: service.description,
-      icon_name: service.icon_name,
-      order_index: service.order_index,
-    });
+    setFormData(next);
+    setBaseline(next);
     setShowForm(true);
   };
 
+  const closeForm = async () => {
+    if (!(await confirmDiscard())) return;
+    resetForm();
+  };
+
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this service?")) return;
+    const ok = await confirm({
+      title: "Delete this service?",
+      message: "It will be removed from the website. This can't be undone.",
+      confirmLabel: "Delete service",
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       await deleteService(id);
@@ -97,7 +120,8 @@ export default function ServicesTab() {
   };
 
   const resetForm = () => {
-    setFormData({ title: "", description: "", icon_name: "Globe", order_index: 0 });
+    setFormData(emptyForm);
+    setBaseline(emptyForm);
     setEditingService(null);
     setShowForm(false);
   };
@@ -112,13 +136,13 @@ export default function ServicesTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Services</h2>
           <p className="text-muted-foreground">Manage your services offerings</p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => openForm(null)}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -130,15 +154,17 @@ export default function ServicesTab() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-6"
+          className="bg-card border border-border rounded-2xl p-4 sm:p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold">
               {editingService ? "Edit Service" : "New Service"}
             </h3>
             <button
-              onClick={resetForm}
-              className="p-2 hover:bg-secondary rounded-lg transition-colors"
+              type="button"
+              onClick={closeForm}
+              aria-label="Close form"
+              className="p-2.5 hover:bg-secondary rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -188,16 +214,17 @@ export default function ServicesTab() {
               </select>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 type="submit"
-                className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                disabled={saving}
+                className="flex-1 disabled:opacity-50 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
               >
                 {editingService ? "Update Service" : "Create Service"}
               </button>
               <button
                 type="button"
-                onClick={resetForm}
+                onClick={closeForm}
                 className="px-6 py-3 rounded-xl border border-border hover:bg-secondary transition-colors"
               >
                 Cancel
@@ -218,13 +245,10 @@ export default function ServicesTab() {
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors"
+              className="bg-card border border-border rounded-2xl p-4 sm:p-6 hover:border-primary/30 transition-colors"
             >
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-secondary rounded-xl">
-                  <GripVertical className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0 break-words">
                   <h3 className="text-xl font-semibold text-foreground mb-2">{service.title}</h3>
                   <p className="text-muted-foreground">{service.description}</p>
                   <div className="mt-2 text-sm text-primary font-medium">
@@ -233,7 +257,7 @@ export default function ServicesTab() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleEdit(service)}
+                    onClick={() => openForm(service)}
                     className="p-2 hover:bg-secondary rounded-lg transition-colors"
                     title="Edit"
                   >

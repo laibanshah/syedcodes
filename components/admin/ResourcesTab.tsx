@@ -1,295 +1,286 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { Upload, Link as LinkIcon, FileText, Loader2, Edit, Trash2, X } from "lucide-react";
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Upload, Link as LinkIcon, FileText, Pencil, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { uploadFile, refreshPublicPages, formatBytes, type UploadProgress } from "@/lib/admin-client";
+import { useConfirm, useConfirmDiscard, useUnsavedGuard } from "./guard";
+import {
+  Field, TabHeader, PrimaryButton, SecondaryButton, LoadingBlock, ErrorBlock, UploadBar, inputClass, errMsg,
+} from "./ui";
 
 type Resource = {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   resource_type: "link" | "file";
   url: string | null;
   file_path: string | null;
   created_at: string;
 };
 
+interface ResourceForm {
+  title: string;
+  description: string;
+  resourceType: "link" | "file";
+  url: string;
+}
+
+const emptyForm: ResourceForm = { title: "", description: "", resourceType: "link", url: "" };
+
 export default function ResourcesTab() {
   const [resources, setResources] = useState<Resource[]>([]);
-  const [isLoadingResources, setIsLoadingResources] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [resourceType, setResourceType] = useState<"link" | "file">("link");
-  const [url, setUrl] = useState("");
+  const [form, setForm] = useState<ResourceForm>(emptyForm);
+  const [baseline, setBaseline] = useState<ResourceForm>(emptyForm);
   const [file, setFile] = useState<File | null>(null);
-  
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error", text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [progress, setProgress] = useState<UploadProgress | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    fetchResources();
+  const confirm = useConfirm();
+  const confirmDiscard = useConfirmDiscard();
+
+  const dirty = JSON.stringify(form) !== JSON.stringify(baseline) || file !== null;
+  useUnsavedGuard(dirty);
+
+  const load = useCallback(async () => {
+    const { data, error } = await supabase.from("resources").select("*").order("created_at", { ascending: false });
+    if (error) setLoadError(error.message);
+    else {
+      setLoadError(null);
+      setResources((data ?? []) as Resource[]);
+    }
+    setLoading(false);
   }, []);
 
-  const fetchResources = async () => {
-    setIsLoadingResources(true);
-    try {
-      const { data, error } = await supabase
-        .from("resources")
-        .select("*")
-        .order("created_at", { ascending: false });
-        
-      if (error) throw error;
-      setResources(data || []);
-    } catch (error) {
-      console.error("Failed to fetch resources:", error);
-    } finally {
-      setIsLoadingResources(false);
-    }
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const resetForm = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setBaseline(emptyForm);
+    setFile(null);
+    setProgress(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setMessage(null);
-
+    setSaving(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      let filePath = null;
-
-      if (resourceType === "file" && file) {
-        // Upload file to Supabase Storage
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const uploadPath = `${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("resources")
-          .upload(uploadPath, file);
-
-        if (uploadError) throw uploadError;
-        filePath = uploadPath;
+      let filePath: string | null = null;
+      if (form.resourceType === "file" && file) {
+        const uploaded = await uploadFile("resources", file, "resource", {
+          onProgress: setProgress,
+          signal: controller.signal,
+        });
+        filePath = uploaded.path;
       }
+
+      const existing = resources.find((r) => r.id === editingId);
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        resource_type: form.resourceType,
+        url: form.resourceType === "link" ? form.url.trim() : null,
+        file_path: form.resourceType === "file" ? filePath ?? existing?.file_path ?? null : null,
+      };
+      if (form.resourceType === "file" && !payload.file_path) throw new Error("Please choose a file to upload.");
 
       if (editingId) {
-        // Find existing record to preserve file_path if a new file isn't uploaded
-        const existingResource = resources.find(r => r.id === editingId);
-        const updatedFilePath = filePath || (resourceType === "file" ? existingResource?.file_path : null);
-
-        const { error: updateError } = await supabase
-          .from("resources")
-          .update({
-            title,
-            description,
-            resource_type: resourceType,
-            url: resourceType === "link" ? url : null,
-            file_path: updatedFilePath,
-          })
-          .eq("id", editingId);
-
-        if (updateError) throw updateError;
-        setMessage({ type: "success", text: "Resource updated successfully!" });
+        const { error } = await supabase.from("resources").update({ ...payload, updated_at: new Date().toISOString() }).eq("id", editingId);
+        if (error) throw error;
+        // The old file is no longer referenced when it was replaced or the resource became a link.
+        if (existing?.file_path && existing.file_path !== payload.file_path) {
+          await supabase.storage.from("resources").remove([existing.file_path]);
+        }
+        toast.success("Resource updated");
       } else {
-        const { error: dbError } = await supabase.from("resources").insert({
-          title,
-          description,
-          resource_type: resourceType,
-          url: resourceType === "link" ? url : null,
-          file_path: filePath,
-        });
-
-        if (dbError) throw dbError;
-        setMessage({ type: "success", text: "Resource added successfully!" });
+        const { error } = await supabase.from("resources").insert(payload);
+        if (error) throw error;
+        toast.success("Resource added");
       }
-      
+
       resetForm();
-      fetchResources();
-      
-    } catch (error: any) {
-      console.error(error);
-      setMessage({ type: "error", text: error.message || "Failed to save resource." });
+      await load();
+      await refreshPublicPages(["/resources"]);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") toast.message("Upload cancelled");
+      else toast.error(errMsg(err));
     } finally {
-      setIsSubmitting(false);
+      setSaving(false);
+      setProgress(null);
+      abortRef.current = null;
     }
   };
 
-  const handleEdit = (resource: Resource) => {
-    setEditingId(resource.id);
-    setTitle(resource.title);
-    setDescription(resource.description || "");
-    setResourceType(resource.resource_type);
-    setUrl(resource.url || "");
-    setFile(null); // Clear file selection
+  const handleEdit = async (r: Resource) => {
+    if (dirty && !(await confirmDiscard())) return;
+    const next: ResourceForm = {
+      title: r.title,
+      description: r.description ?? "",
+      resourceType: r.resource_type,
+      url: r.url ?? "",
+    };
+    setEditingId(r.id);
+    setForm(next);
+    setBaseline(next);
+    setFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id: string, filePath: string | null) => {
-    if (!confirm("Are you sure you want to delete this resource?")) return;
+  const handleCancel = async () => {
+    if (!(await confirmDiscard())) return;
+    resetForm();
+  };
 
+  const handleDelete = async (r: Resource) => {
+    const ok = await confirm({
+      title: `Delete "${r.title}"?`,
+      message: r.file_path
+        ? "The resource and its uploaded file will be removed for good."
+        : "The resource will be removed for good.",
+      confirmLabel: "Delete resource",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
-      if (filePath) {
-        await supabase.storage.from("resources").remove([filePath]);
-      }
-      const { error } = await supabase.from("resources").delete().eq("id", id);
+      if (r.file_path) await supabase.storage.from("resources").remove([r.file_path]);
+      const { error } = await supabase.from("resources").delete().eq("id", r.id);
       if (error) throw error;
-      
-      setResources(resources.filter(r => r.id !== id));
-      if (editingId === id) resetForm();
-    } catch (error) {
-      console.error("Failed to delete resource:", error);
-      alert("Failed to delete resource.");
+      toast.success("Resource deleted");
+      if (editingId === r.id) resetForm();
+      await load();
+      await refreshPublicPages(["/resources"]);
+    } catch (err) {
+      toast.error(`Failed to delete: ${errMsg(err)}`);
     }
   };
 
-  const resetForm = () => {
-    setEditingId(null);
-    setTitle("");
-    setDescription("");
-    setUrl("");
-    setFile(null);
-    setResourceType("link");
-    setMessage(null);
-  };
+  if (loading) return <LoadingBlock label="Loading resources..." />;
+  if (loadError) return <ErrorBlock message={loadError} />;
+
+  const typeBtn = (type: "link" | "file") =>
+    `flex-1 flex items-center justify-center gap-2 min-h-12 rounded-xl border transition-all ${
+      form.resourceType === type ? "bg-primary/10 border-primary text-primary" : "border-border hover:bg-secondary"
+    }`;
 
   return (
-    <div className="min-h-screen p-8 md:p-24 max-w-4xl mx-auto space-y-12">
-      <div>
-        <div className="flex items-center gap-4 mb-8 justify-between">
-          <h1 className="text-4xl font-bold tracking-tight">
-            {editingId ? "Edit Resource" : "Add Resource"}
-          </h1>
-          {editingId && (
-            <button onClick={resetForm} className="text-sm border border-white/10 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
-              Cancel Edit
+    <div className="space-y-6">
+      <TabHeader
+        title="Resources"
+        description="Links and downloads listed on the /resources page"
+        action={
+          editingId ? (
+            <SecondaryButton type="button" onClick={handleCancel} className="w-full sm:w-auto">
+              <X className="w-4 h-4" /> Cancel edit
+            </SecondaryButton>
+          ) : undefined
+        }
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-5 bg-card border border-border rounded-2xl p-4 sm:p-6">
+        <h3 className="text-lg font-semibold">{editingId ? "Edit resource" : "Add resource"}</h3>
+        <Field label="Title">
+          <input className={inputClass} required value={form.title} placeholder="E.g., Complete UI Kit 2026"
+            onChange={(e) => setForm({ ...form, title: e.target.value })} />
+        </Field>
+        <Field label="Description">
+          <textarea className={`${inputClass} resize-y`} rows={3} value={form.description}
+            placeholder="A brief description of what this resource contains..."
+            onChange={(e) => setForm({ ...form, description: e.target.value })} />
+        </Field>
+
+        <div>
+          <span className="block text-sm font-medium text-foreground mb-2">Type</span>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button type="button" className={typeBtn("link")} onClick={() => setForm({ ...form, resourceType: "link" })}>
+              <LinkIcon className="w-5 h-5" /> External link
             </button>
-          )}
+            <button type="button" className={typeBtn("file")} onClick={() => setForm({ ...form, resourceType: "file" })}>
+              <FileText className="w-5 h-5" /> Downloadable file
+            </button>
+          </div>
         </div>
 
-        {message && (
-          <div className={`p-4 rounded-xl mb-8 ${message.type === 'success' ? 'bg-green-950/30 text-green-400 border border-green-500/30' : 'bg-red-950/30 text-red-400 border border-red-500/30'}`}>
-            {message.text}
+        {form.resourceType === "link" ? (
+          <Field label="URL">
+            <input className={inputClass} type="url" required value={form.url} placeholder="https://..."
+              onChange={(e) => setForm({ ...form, url: e.target.value })} />
+          </Field>
+        ) : (
+          <div className="space-y-3">
+            <Field
+              label={`File${editingId ? " (leave empty to keep the current one)" : ""}`}
+              hint="Files over 6 MB upload in resumable chunks, so a dropped connection won't lose your progress."
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                required={!editingId || !resources.find((r) => r.id === editingId)?.file_path}
+                disabled={saving}
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm"
+              />
+            </Field>
+            {file && !saving && (
+              <p className="text-xs text-muted-foreground">{file.name} · {formatBytes(file.size)}</p>
+            )}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-2xl border">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Title</label>
-            <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="E.g., Complete UI Kit 2026"
-            />
-          </div>
+        {progress && <UploadBar percent={progress.percent} retrying={progress.retrying} label="Uploading file" />}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="A brief description of what this resource contains..."
-            />
-          </div>
-
-          <div className="space-y-4">
-            <label className="text-sm font-medium">Resource Type</label>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setResourceType("link")}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border transition-all ${resourceType === 'link' ? 'bg-primary/10 border-primary text-primary' : 'hover:bg-muted'}`}
-              >
-                <LinkIcon className="w-5 h-5" /> External Link
-              </button>
-              <button
-                type="button"
-                onClick={() => setResourceType("file")}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border transition-all ${resourceType === 'file' ? 'bg-primary/10 border-primary text-primary' : 'hover:bg-muted'}`}
-              >
-                <FileText className="w-5 h-5" /> Downloadable File
-              </button>
-            </div>
-          </div>
-
-          {resourceType === "link" ? (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">URL</label>
-              <input
-                type="url"
-                required={resourceType === "link"}
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="https://..."
-              />
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Upload File {editingId && "(Leave empty to keep existing)"}</label>
-              <input
-                type="file"
-                required={resourceType === "file" && !editingId}
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11"
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : editingId ? (
-              <Edit className="w-5 h-5 mr-2" />
-            ) : (
-              <Upload className="w-5 h-5 mr-2" />
-            )}
-            {isSubmitting ? (editingId ? "Updating..." : "Uploading...") : (editingId ? "Update Resource" : "Add Resource")}
-          </button>
-        </form>
-      </div>
+        <div className="flex flex-col-reverse sm:flex-row gap-3">
+          {saving && progress ? (
+            <SecondaryButton type="button" onClick={() => abortRef.current?.abort()}>
+              Cancel upload
+            </SecondaryButton>
+          ) : null}
+          <PrimaryButton type="submit" loading={saving} className="flex-1">
+            <Upload className="w-5 h-5" />
+            {saving ? (progress ? "Uploading…" : "Saving…") : editingId ? "Update resource" : "Add resource"}
+          </PrimaryButton>
+        </div>
+      </form>
 
       <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-6 border-b border-white/10 pb-4">Existing Resources</h2>
-        {isLoadingResources ? (
-          <div className="flex justify-center p-8">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : resources.length === 0 ? (
-          <p className="text-muted-foreground text-center p-8 bg-card rounded-2xl border">No resources found.</p>
+        <h3 className="text-lg font-semibold mb-4">Existing resources</h3>
+        {resources.length === 0 ? (
+          <p className="text-muted-foreground text-center p-8 bg-card rounded-2xl border border-border">No resources yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {resources.map((resource) => (
-              <div key={resource.id} className="bg-card p-5 rounded-2xl border flex flex-col gap-3 group transition-colors hover:border-white/20">
+            {resources.map((r) => (
+              <div key={r.id} className="bg-card p-5 rounded-2xl border border-border flex flex-col gap-3 hover:border-primary/30 transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2 text-primary">
-                    {resource.resource_type === 'link' ? <LinkIcon className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                    <span className="text-xs font-semibold uppercase tracking-wider">{resource.resource_type}</span>
+                    {r.resource_type === "link" ? <LinkIcon className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                    <span className="text-xs font-semibold uppercase tracking-wider">{r.resource_type}</span>
                   </div>
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleEdit(resource)} className="p-1.5 hover:bg-white/10 rounded-md text-muted-foreground hover:text-white transition-colors">
-                      <Edit className="w-4 h-4" />
+                  <div className="flex items-center gap-1">
+                    <button type="button" onClick={() => handleEdit(r)} aria-label="Edit"
+                      className="p-2.5 min-w-10 min-h-10 inline-flex items-center justify-center hover:bg-secondary rounded-lg text-muted-foreground hover:text-foreground transition-colors">
+                      <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(resource.id, resource.file_path)} className="p-1.5 hover:bg-red-500/20 rounded-md text-muted-foreground hover:text-red-400 transition-colors">
+                    <button type="button" onClick={() => handleDelete(r)} aria-label="Delete"
+                      className="p-2.5 min-w-10 min-h-10 inline-flex items-center justify-center hover:bg-destructive/10 rounded-lg text-destructive transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-                <h3 className="font-semibold text-lg">{resource.title}</h3>
-                {resource.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">{resource.description}</p>
-                )}
+                <h4 className="font-semibold text-lg break-words">{r.title}</h4>
+                {r.description && <p className="text-sm text-muted-foreground line-clamp-2">{r.description}</p>}
               </div>
             ))}
           </div>

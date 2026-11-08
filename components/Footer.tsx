@@ -1,3 +1,5 @@
+import SiteLogo from "@/components/SiteLogo";
+
 interface SocialLink {
   platform: string;
   url: string;
@@ -5,16 +7,16 @@ interface SocialLink {
 
 interface FooterProps {
   socialLinks?: SocialLink[];
+  logoUrl?: string;
 }
 
-export default function Footer({ socialLinks }: FooterProps) {
+export default function Footer({ socialLinks, logoUrl }: FooterProps) {
   return (
-    <footer className="border-t border-white/[0.06] py-12 md:py-16">
+    <footer className="border-t border-black/[0.06] py-12 md:py-16">
       <div className="container-premium">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-sm md:text-base font-heading font-semibold tracking-tight text-foreground">
-            Syed<span className="text-brand">Codes</span>
-            <span className="text-muted-foreground">.UI</span>
+            <SiteLogo logoUrl={logoUrl} />
           </div>
 
           <p className="text-muted-foreground text-xs md:text-sm tracking-wide">

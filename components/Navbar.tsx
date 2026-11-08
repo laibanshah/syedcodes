@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import SiteLogo from "@/components/SiteLogo";
 
 interface NavLink {
   name: string;
@@ -21,23 +22,18 @@ const navLinks: NavLink[] = [
   { name: "All Projects", href: "/projects", external: true },
 ];
 
-interface SocialLink {
-  platform: string;
-  url: string;
-}
-
 interface NavbarProps {
-  socialLinks?: SocialLink[];
+  logoUrl?: string;
 }
 
-export default function Navbar({}: NavbarProps) {
+export default function Navbar({ logoUrl }: NavbarProps) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -93,10 +89,9 @@ export default function Navbar({}: NavbarProps) {
           <Link
             href="/#home"
             onClick={(e) => scrollToSection(e, "#home")}
-            className="text-sm md:text-base font-heading font-semibold tracking-tight text-foreground group md:flex-1"
+            className="inline-flex items-center text-sm md:text-base font-heading font-semibold tracking-tight text-foreground group md:flex-1"
           >
-            Syed<span className="text-brand">Codes</span>
-            <span className="text-muted-foreground">.UI</span>
+            <SiteLogo logoUrl={logoUrl} />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 lg:gap-10">
